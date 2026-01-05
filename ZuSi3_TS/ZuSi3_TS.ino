@@ -1,4 +1,3 @@
-#define DEGUG
 #include <Arduino.h>
 #include <Arduino_JSON.h>
 #include <WiFi.h>
@@ -21,6 +20,7 @@ const String WPA2PWD =  "28149516463916020556";
 
 WiFiClient client;
 ZuSi3_TS_DashBoard dashBoard;
+TaskHandle_t UpdateTaskHandle = NULL;
 
 void setup() {
   Serial.begin(115200);
@@ -33,28 +33,37 @@ void setup() {
   {
     pinMode(G_DigitalOutGPIOPins[i], OUTPUT);
   }
+
+  xTaskCreatePinnedToCore(
+    UpdateTask,        // Task function
+    "UpdateTask",      // Task name
+    10000,             // Stack size (bytes)
+    NULL,              // Parameters
+    1,                 // Priority
+    &UpdateTaskHandle, // Task handle
+    1                  // Core
+  );
 }
 
 void loop() 
 {
-  for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
-  {
-    G_AnalogInGPIOData[i] = analogRead(G_AnalogInGPIOPins[i]);
-  }
-  
-  dashBoard.Update();
-  
-  for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
-  {
-    digitalWrite(G_DigitalOutGPIOPins[i], G_DigitalOutGPIOData[i]);
-  }
+}
 
-/*      client.flush();
-      for(int i=0; i<sizeof(BEFEHL); i++)
-      {
-        client.write(BEFEHL[i]);
-      }
-*/
+void UpdateTask(void *parameter) {
+  while(true) 
+  {
+    for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
+    {
+      G_AnalogInGPIOData[i] = analogRead(G_AnalogInGPIOPins[i]);
+    }
+
+    dashBoard.Update();
+
+    for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
+    {
+      digitalWrite(G_DigitalOutGPIOPins[i], G_DigitalOutGPIOData[i]);
+    }
+  }
 }
 
 void ConnectToZuSi()
@@ -78,7 +87,7 @@ void ConnectToZuSi()
 
   client.setTimeout(20000);
   
-  if(!client.connect(HOST, PORT)())
+  if(!client.connect(HOST, PORT))
   {
     Serial.println(" Connected");
   }

@@ -1,0 +1,183 @@
+Client -> Server
+
+HELLO
+
+0 0 0 0 1 0 0 0 0 0 1 0 4 0 0 0 1 0 2 0 4 0 0 0 2 0 2 0 21 0 0 0 3 0 90 117 83 105 51 95 84 83 95 84 101 115 116 99 108 105 101 110 116 5 0 0 0 4 0 51 46 53 255 255 255 255 255 255 255 255
+
+00 00 00 00# knoten
+01 00# ID Verbindungsaufbau
+00 00 00 00# knoten
+01 00# ID HELLO
+04 00 00 00# Attribut Länge 4
+01 00# ID Protokollversion
+02 00# Protokollversion
+04 00 00 00# Attribut Länge 4
+02 00# ID Clienttyp
+02 00# Typ Fahrpult
+21 00 00 00# Attribut Länge 21, 2 Byte für ID und 19 Zeichen
+03 00#ID Bezeichnung
+90 117 83 105 51 95 84 83 95 84 101 115 116 99 108 105 101 110 116# "ZuSi3_TS_Testclient"
+05 00 00 00# Attribut Länge 5
+04 00# ID Versionsnummer
+51 46 53# Version "3.5"
+255 255 255 255# Knoten ende
+255 255 255 255# Knoten ende
+
+NEEDED_DATA
+
+0 0 0 0 2 0 0 0 0 0 3 0 0 0 0 0 10 0 4 0 0 0 1 0 1 0 255 255 255 255 255 255 255 255 255 255 255 255
+
+0 0 0 0# Knoten
+2 0# ID 2, Client-Anwendung
+0 0 0 0# Knoten
+3 0# ID 3, NEEDED_DATA
+0 0 0 0# Knoten
+10 0# ID 10, Führerstandsanzeigen
+4 0 0 0# Attribut 4 Bytes
+1 0# ID 1, Führerstands-ID
+1 0# 1=Geschwindigkeit
+255 255 255 255# Knoten Ende
+255 255 255 255# Knoten Ende
+255 255 255 255# Knoten Ende
+
+INPUT Fahrschalter Stufe 0
+
+0 0 0 0 2 0 0 0 0 0 10 1 0 0 0 0 1 0 4 0 0 0 1 0 1 0 4 0 0 0 2 0 0 0 4 0 0 0 3 0 7 0 4 0 0 0 4 0 0 0 4 0 0 0 5 0 0 0 255 255 255 255 255 255 255 255 255 255 255 255
+
+0 0 0 0# Knoten
+2 0# ID 2 Client-Anwendung
+0 0 0 0# Knoten
+10 1# ID 266 INPUT
+0 0 0 0# Knoten
+1 0# ID 1 Tastatureingaben
+4 0 0 0# Attribut 4 Bytes
+1 0# ID 1 Tastaturzuordnung
+1 0#
+4 0 0 0# Attribut 4 Bytes
+2 0# ID 2 Tastaturkommando
+0 0#
+4 0 0 0# Attribut 4 Bytes
+3 0# ID 3 Tastaturaktion
+7 0#
+4 0 0 0# Attribut 4 Bytes
+4 0# ID 4 Schalterposition
+0 0#
+4 0 0 0# Attribut 4 Bytes
+5 0# ID 5 Parameter
+0 0#
+255 255 255 255# Knoten Ende
+255 255 255 255# Knoten Ende
+255 255 255 255# Knoten Ende
+
+INPUT Preife down
+
+0 0 0 0 2 0 0 0 0 0 10 1 0 0 0 0 1 0 4 0 0 0 1 0 12 0 4 0 0 0 2 0 69 0 4 0 0 0 3 0 1 0 4 0 0 0 4 0 1 0 4 0 0 0 5 0 1 0 255 255 255 255 255 255 255 255 255 255 255 255
+
+0 0 0 0# Knoten
+2 0# ID 2 Client-Anwendung
+0 0 0 0# Knoten
+10 1# ID 266 INPUT
+0 0 0 0# Knoten
+1 0# ID 1 Tastatureingaben
+4 0 0 0# Attribut 4 Bytes
+1 0# ID 1 Tastaturzuordnung
+12 0#
+4 0 0 0# Attribut 4 Bytes
+2 0# ID 2 Tastaturkommando
+69 0#
+4 0 0 0# Attribut 4 Bytes
+3 0# ID 3 Tastaturaktion
+1 0#
+4 0 0 0# Attribut 4 Bytes
+4 0# ID 4 Schalterposition
+1 0#
+4 0 0 0# Attribut 4 Bytes
+5 0# ID 5 Parameter
+1 0#
+255 255 255 255# Knoten Ende
+255 255 255 255# Knoten Ende
+255 255 255 255# Knoten Ende
+
+INPUT Preife up
+
+0 0 0 0 2 0 0 0 0 0 10 1 0 0 0 0 1 0 4 0 0 0 1 0 12 0 4 0 0 0 2 0 70 0 4 0 0 0 3 0 2 0 4 0 0 0 4 0 0 0 4 0 0 0 5 0 0 0 255 255 255 255 255 255 255 255 255 255 255 255
+
+0 0 0 0# Knoten
+2 0# ID 2 Client-Anwendung
+0 0 0 0# Knoten
+10 1# ID 266 INPUT
+0 0 0 0# Knoten
+1 0# ID 1 Tastatureingaben
+4 0 0 0# Attribut 4 Bytes
+1 0# ID 1 Tastaturzuordnung
+12 0#
+4 0 0 0# Attribut 4 Bytes
+2 0# ID 2 Tastaturkommando
+70 0#
+4 0 0 0# Attribut 4 Bytes
+3 0# ID 3 Tastaturaktion
+2 0#
+4 0 0 0# Attribut 4 Bytes
+4 0# ID 4 Schalterposition
+0 0#
+4 0 0 0# Attribut 4 Bytes
+5 0# ID 5 Parameter
+0 0#
+255 255 255 255# Knoten Ende
+255 255 255 255# Knoten Ende
+255 255 255 255# Knoten Ende
+
+Server -> Client
+
+ACK_HELLO
+
+0 0 0 0 1 0 0 0 0 0 2 0 10 0 0 0 1 0 51 46 53 46 49 50 46 48 3 0 0 0 2 0 48 3 0 0 0 3 0 0 10 0 0 0 4 0 57 142 227 56 5 9 229 64 5 0 0 0 5 0 65 46 50 255 255 255 255 255 255 255 255
+
+0 0 0 0# Knoten
+1 0# ID 1 (Verbindungsaufbau)
+0 0 0 0# Knoten
+2 0# ID 2 (ACK_HELLO)
+10 0 0 0# Attribut Länge 10
+1 0# ID 1
+51 46 53 46 49 50 46 48# String[8] "3.5.12.0" (ZuSi-Version)
+3 0 0 0# Attribut Länge 3
+2 0# ID 2
+48# String[1] "0" (Verbidungsinfo)
+3 0 0 0# Attribut Länge 3
+3 0# ID 3
+0# Byte 0 (Akzeptanz)
+10 0 0 0# Attribut Länge 10
+4 0# ID 4
+57 142 227 56 5 9 229 64# Datum 12.12.2017 03:55:00 (Startzeitpunkt)
+5 0 0 0# Attribut Länge 5
+5 0# ID 5
+65 46 50# String[3] "A.2" (Protokollversion)
+255 255 255 255# Knoten ende
+255 255 255 255# Knoten ende
+
+DATA_OPERATION
+
+0 0 0 0# Knoten
+2 0# ID 2 Client-Anwendung
+0 0 0 0# Knoten
+11 0# ID 11 DATA_OPERATION
+0 0 0 0# Knoten
+1 0# ID 1 Betätigungsvorgang
+4 0 0 0# Attribut 4 Bytes
+1 0# ID 1 Tastaturzuordnung
+1 0# Fahrschalter
+4 0 0 0# Attribut 4 Bytes
+2 0# ID 2 Tastaturkommando
+0 0#
+4 0 0 0# Attribut 4 Bytes
+3 0# ID 3 Tastaturaktion
+0 0#
+4 0 0 0# Attribut 4 Bytes
+4 0# ID 4 Schalterposition
+1 0#
+4 0 0 0# Attribut 4 Bytes
+5 0# ID 5 Parameter
+0 0#
+255 255 255 255# Knoten Ende
+255 255 255 255# Knoten Ende
+255 255 255 255# Knoten Ende

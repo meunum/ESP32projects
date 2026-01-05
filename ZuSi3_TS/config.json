@@ -1,0 +1,33 @@
+{
+    "ZuSi3_TS_config": {
+        "hardware": {
+            "steuerelemente": [
+                {
+                    "name": "stufenschalter_1",
+                    "klasse": "DynamischerStufenschalter",
+					"gpio": {
+						"ena": 9,
+						"dir": 10,
+						"step": 11,
+						"sensor": 12
+					},
+					"kalibrierung": {"min": 685, "max": 3415}
+                }
+            ]
+        },
+        "baureihen": {
+            "default": {
+                "steuerelemente": [
+                    {
+                        "name": "stufenschalter_1",
+                        "verwendung": "Fahrstufe",
+                        "tastaturZuordnung": "1",
+                        "stufen": 15
+                    }
+                ]
+            },
+            "BR118": {},
+            "BR154": {}
+        }
+    }
+}
