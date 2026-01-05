@@ -1,10 +1,10 @@
 #pragma once
 #include <Arduino.h>
 
-extern int* DigitalOutGPIOPins;
-extern int* AnalogInGPIOPins;
-extern int* DigitalOutGPIOData;
-extern float* AnalogInGPIOData;
+extern int* G_DigitalOutGPIOPins;
+extern int* G_AnalogInGPIOPins;
+extern int* G_DigitalOutGPIOData;
+extern float* G_AnalogInGPIOData;
 
 class StepperMotor
 {
@@ -12,10 +12,10 @@ public:
   void Init(int ena, int dir, int step);
   void Step();
 
-  int GetEnable() { return DigitalOutGPIOData[enaIndex]; }
-  void SetEnable(int value) { DigitalOutGPIOData[enaIndex] = value; }
-  int GetDirection() { return DigitalOutGPIOData[dirIndex]; }
-  void SetDirection(int value) { DigitalOutGPIOData[enaIndex] = value; }
+  int GetEnable() { return G_DigitalOutGPIOData[enaIndex]; }
+  void SetEnable(int value) { G_DigitalOutGPIOData[enaIndex] = value; }
+  int GetDirection() { return G_DigitalOutGPIOData[dirIndex]; }
+  void SetDirection(int value) { G_DigitalOutGPIOData[enaIndex] = value; }
 private:
   int enaIndex;
   int dirIndex;

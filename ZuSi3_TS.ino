@@ -1,3 +1,4 @@
+#define DEGUG
 #include <Arduino.h>
 #include <Arduino_JSON.h>
 #include <WiFi.h>
@@ -21,17 +22,44 @@ const String WPA2PWD =  "28149516463916020556";
 WiFiClient client;
 ZuSi3_TS_DashBoard dashBoard;
 
-int analogGPIOPinsLength = 0;
-int analogGPIODataLength = 0;
-int prevStufe = 0;
-float prevAnalogValue = 0;
-int motorHold = 0;
-
 void setup() {
   Serial.begin(115200);
 //  if (DEV_Module_Init() == 0) { } else { Serial.println("GPIO Init Fail!"); exit(0); }
+//  ConnectToZuSi();
 
-/*  Serial.print("Connecting WiFi ");
+  dashBoard.SetConfig(configJson);
+
+  for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
+  {
+    pinMode(G_DigitalOutGPIOPins[i], OUTPUT);
+  }
+}
+
+void loop() 
+{
+  for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
+  {
+    G_AnalogInGPIOData[i] = analogRead(G_AnalogInGPIOPins[i]);
+  }
+  
+  dashBoard.Update();
+  
+  for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
+  {
+    digitalWrite(G_DigitalOutGPIOPins[i], G_DigitalOutGPIOData[i]);
+  }
+
+/*      client.flush();
+      for(int i=0; i<sizeof(BEFEHL); i++)
+      {
+        client.write(BEFEHL[i]);
+      }
+*/
+}
+
+void ConnectToZuSi()
+{
+  Serial.print("Connecting WiFi ");
 
   WiFi.begin(SSID, WPA2PWD);
   WiFi.mode(WIFI_STA);
@@ -69,38 +97,4 @@ void setup() {
     client.write(NEEDED_DATA[i]);
   }
   client.flush();
-*/
-  dashBoard.SetConfig(configJson);
-  analogGPIOPinsLength = sizeof(AnalogInGPIOPins) / sizeof(int);
-  analogGPIODataLength = sizeof(AnalogInGPIOData) / sizeof(float);
-  pinMode(23, OUTPUT);
-}
-
-void loop() 
-{
-  if(analogGPIODataLength > 0 & analogGPIOPinsLength > 0)
-  {
-    ZuSi3_TS_Control* schalter = dashBoard.Controls[0]; 
-
-    AnalogInGPIOData[0] = analogRead(AnalogInGPIOPins[0]);
-    schalter->Update();
-    digitalWrite(DigitalOutGPIOPins[0], DigitalOutGPIOData[0]);
-
-    byte stufe = schalter->GetWert();
-
-    if(stufe != prevStufe)
-    {
-      prevStufe = stufe;
-      BEFEHL[48] = stufe;
-
-   Serial.print("Stufe: ");  Serial.println(stufe);
-
-/*      client.flush();
-      for(int i=0; i<sizeof(BEFEHL); i++)
-      {
-        client.write(BEFEHL[i]);
-      }
-*/
-    }
-  }
 }

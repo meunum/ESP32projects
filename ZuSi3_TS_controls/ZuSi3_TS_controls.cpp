@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include <ZuSi3_TS_controls.h>
 
-int* DigitalOutGPIOPins;
-int* AnalogInGPIOPins;
-int* DigitalOutGPIOData;
-float* AnalogInGPIOData;
+int* G_DigitalOutGPIOPins;
+int* G_AnalogInGPIOPins;
+int* G_DigitalOutGPIOData;
+float* G_AnalogInGPIOData;
 
 void ZuSi3_TS_Control::SetTastaturZuordnung(int value)
 {
@@ -39,7 +39,7 @@ void DynamischerStufenSchalter::Update()
 {
   int newStufe = 0;
   int mapValue = 0;
-  int sensorValue = AnalogInGPIOData[sensorIndex];
+  int sensorValue = G_AnalogInGPIOData[sensorIndex];
 
   if(sensorValue > maxSensorValue)
   {

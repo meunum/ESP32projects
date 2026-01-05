@@ -1,3 +1,4 @@
+#define DEBUG
 #include <Arduino.h>
 #include <Arduino_JSON.h>
 #include <ZuSi3_TS_dashboard.h>
@@ -9,10 +10,29 @@ ZuSi3_TS_DashBoard::ZuSi3_TS_DashBoard()
 void ZuSi3_TS_DashBoard::Init(int controlCount, int digitalPinCount, int analogPinCount)
 {
   Controls = new ZuSi3_TS_Control*[controlCount];
-  DigitalOutGPIOPins = new int[digitalPinCount];
-  AnalogInGPIOPins = new int[analogPinCount];
-  DigitalOutGPIOData = new int[digitalPinCount];
-  AnalogInGPIOData = new float[analogPinCount];
+  G_DigitalOutGPIOPins = new int[digitalPinCount];
+  G_AnalogInGPIOPins = new int[analogPinCount];
+  G_DigitalOutGPIOData = new int[digitalPinCount];
+  G_AnalogInGPIOData = new float[analogPinCount];
+  AnalogInGPIOLength = sizeof(G_AnalogInGPIOPins) / sizeof(int);
+  DigitalOutGPIOLength = sizeof(G_DigitalOutGPIOPins) / sizeof(int);
+}
+
+void ZuSi3_TS_DashBoard::Update()
+{
+  for(int i = 0; i < ControlCount; i++)
+  {
+    Controls[i]->Update();
+
+#ifdef DEBUG
+    byte stufe = Controls[i]->GetWert();
+    if(stufe != prevStufe)
+    {
+      prevStufe = stufe;
+      Serial.print(Controls[i]->ControlName + " Stufe: "); Serial.println(stufe);
+    }
+#endif
+  }
 }
 
 void ZuSi3_TS_DashBoard::AddControl(ZuSi3_TS_Control* control)
@@ -78,16 +98,19 @@ void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
   for (int i = 0; i < controlsConfig.length(); i++)
   {
     JSONVar elementConfig = controlsConfig[i];
+#ifdef DEBUG
+	  Serial.println(elementConfig);
+#endif		  
     String name = elementConfig["name"];
     String klasse = elementConfig["klasse"];
 
     if(klasse == "DynamischerStufenSchalter")
     {
       JSONVar gpio = elementConfig["gpio"];
-      DigitalOutGPIOPins[digitalGpioPinIndex] = (int) gpio["ena"]; int enaIndex = digitalGpioPinIndex++;
-      DigitalOutGPIOPins[digitalGpioPinIndex] = (int) gpio["dir"]; int dirIndex = digitalGpioPinIndex++;
-      DigitalOutGPIOPins[digitalGpioPinIndex] = (int) gpio["step"]; int stepIndex = digitalGpioPinIndex++;
-      AnalogInGPIOPins[analogGpioPinIndex] = (int) gpio["sensor"]; int sensorIndex = analogGpioPinIndex++;
+      G_DigitalOutGPIOPins[digitalGpioPinIndex] = (int) gpio["ena"]; int enaIndex = digitalGpioPinIndex++;
+      G_DigitalOutGPIOPins[digitalGpioPinIndex] = (int) gpio["dir"]; int dirIndex = digitalGpioPinIndex++;
+      G_DigitalOutGPIOPins[digitalGpioPinIndex] = (int) gpio["step"]; int stepIndex = digitalGpioPinIndex++;
+      G_AnalogInGPIOPins[analogGpioPinIndex] = (int) gpio["sensor"]; int sensorIndex = analogGpioPinIndex++;
     
       JSONVar kal = elementConfig["kalibrierung"];
       int analogMin = (int) kal["min"];
@@ -108,11 +131,10 @@ void ZuSi3_TS_DashBoard::loadBaureihenConfig(JSONVar config, String baureihe)
   for (int i = 0; i < controlsConfig.length(); i++)
   {
     JSONVar elementConfig = controlsConfig[i];
-			
-	Serial.println(elementConfig);
-
+#ifdef DEBUG
+	  Serial.println(elementConfig);
+#endif		  
     String name = elementConfig["name"];
-		  
     for(int j = 0; j < ControlCount; j++)
     {
       if (Controls[j]->ControlName == name)
