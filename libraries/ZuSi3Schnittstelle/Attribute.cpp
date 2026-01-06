@@ -5,13 +5,13 @@
 
 #include "Attribute.h"
 
-Attribute::Attribute(int ID) {
+Attribute::Attribute(uint16_t ID) {
 	this->ID = new byte[2];
 	this->ID[0] = (byte)ID;
 	this->ID[1] = (byte)(ID >> 8);
 }
 
-Attribute::Attribute(int ID, byte *DATA, int sizeData) {
+Attribute::Attribute(uint16_t ID, byte *DATA, int sizeData) {
 	this->ID = new byte[2];
 	this->ID[0] = (byte)ID;
 	this->ID[1] = (byte)(ID >> 8);
@@ -20,7 +20,7 @@ Attribute::Attribute(int ID, byte *DATA, int sizeData) {
 	this->sizeDATA = sizeData;
 }
 
-Attribute::Attribute(int ID, int DATA) {
+Attribute::Attribute(uint16_t ID, int DATA) {
 	this->ID = new byte[2];
 	this->ID[0] = (byte)ID;
 	this->ID[1] = (byte)(ID >> 8);
@@ -31,7 +31,16 @@ Attribute::Attribute(int ID, int DATA) {
 	sizeDATA = 2;
 }
 
-Attribute::Attribute(int ID, String DATA) {
+Attribute::Attribute(uint16_t ID, float DATA) {
+	this->ID = new byte[2];
+	this->ID[0] = (byte)ID;
+	this->ID[1] = (byte)(ID >> 8);
+
+	this->DATA = (byte*)&DATA;
+	sizeDATA = 4;
+}
+
+Attribute::Attribute(uint16_t ID, String DATA) {
 	this->ID = new byte[2];
 	this->ID[0] = (byte)ID;
 	this->ID[1] = (byte)(ID >> 8);

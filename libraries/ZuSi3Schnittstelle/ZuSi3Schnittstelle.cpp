@@ -230,6 +230,44 @@ Node *Zusi3Schnittstelle::getNodes(byte *rootID) {
 	return rootNode;
 }
 
+void Zusi3Schnittstelle::inputSchalterposition(uint16_t zuordnung, int16_t position)
+{
+	inputTastatureingabe(zuordnung, 0, 7, position, 0.0);
+}
+
+void Zusi3Schnittstelle::inputTastatureingabe(uint16_t zuordnung, uint16_t kommando, uint16_t aktion, int16_t position, float parameter)
+{
+	if(Tastatureingaben == NULL)
+	{
+		Tastatureingaben = new Node(ID_Tastatureingaben);
+	}
+	
+	Tastatureingaben->addAttribute(new Attribute(ID_Tastaturzuordnung, zuordnung));
+	Tastatureingaben->addAttribute(new Attribute(ID_Tastaturkommando, kommando));
+	Tastatureingaben->addAttribute(new Attribute(ID_Schalterposition, position));
+	Tastatureingaben->addAttribute(new Attribute(ID_Tastaturaktion, aktion)); 
+	Tastatureingaben->addAttribute(new Attribute(ID_Parameter, parameter));
+}
+
+void Zusi3Schnittstelle::sendTastatureingaben()
+{
+	if(Tastatureingaben != NULL)
+	{
+		Node* clientAnwendung = new Node(ID_ClientAnwendung);
+		Node* input = new Node(ID_INPUT);
+		clientAnwendung->addNode(input);
+		input->addNode(Tastatureingaben);
+		int length = 0;
+		byte *data = clientAnwendung->get(&length);
+		
+		client->write(data, length);
+		
+		delete data;
+		delete clientAnwendung;
+		Tastatureingaben = NULL;
+	}
+}
+
 boolean Zusi3Schnittstelle::compare(byte * a, byte * b, int size) {
 	for (int i = 0; i < size; i++) {
 		if (a[i] != b[i]) {

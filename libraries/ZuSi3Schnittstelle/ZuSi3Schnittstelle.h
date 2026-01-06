@@ -7,11 +7,10 @@
 #define ZUSI3SCHNITTSTELLE_H
 
 #include <NetworkClient.h>
+#include <LinkedList.h>
 #include "Node.h"
 #include "Fuehrerstandsanzeigen.h"
-#ifndef LinkedList_h
-#error Bitte lade im Bibliotheksverwalter <LinkedList by Ivan Seidel> in der Version 1.2.3 herunter
-#endif
+#include "ID_Definition.h"
 
 class Zusi3Schnittstelle {
 public:
@@ -25,6 +24,9 @@ public:
 	void requestProgrammdaten(boolean value);
 	void requestProgrammdatenOhneFahrplan(boolean value);
 	void setDebugOutput(boolean output);
+	void inputSchalterposition(uint16_t zuordnung, int16_t position);
+	void inputTastatureingabe(uint16_t zuordnung, uint16_t kommando, uint16_t aktion, int16_t position, float parameter=0);
+	void sendTastatureingaben();
 	String getZusiVersion();
 	String getVersion;
 	String getVerbindungsinfo();
@@ -48,6 +50,7 @@ private:
 	boolean reqProgrammdatenOhneFahrplan = false;
 
 	Node *node = NULL;
+	Node *Tastatureingaben = NULL;
 
 	String versionZusi = "unknown";
 	String verbindungsinfoZusi = "unknown";

@@ -9,10 +9,11 @@
 
 class Attribute {
 public:
-	Attribute(int ID);
-	Attribute(int ID, byte *DATA, int sizeData);
-	Attribute(int ID, int DATA);
-	Attribute(int ID, String DATA);
+	Attribute(uint16_t ID);
+	Attribute(uint16_t ID, byte *DATA, int sizeData);
+	Attribute(uint16_t ID, int DATA);
+	Attribute(uint16_t ID, float DATA);
+	Attribute(uint16_t ID, String DATA);
 	Attribute(byte *ID, byte *DATA, int sizeData);
 	~Attribute();
 

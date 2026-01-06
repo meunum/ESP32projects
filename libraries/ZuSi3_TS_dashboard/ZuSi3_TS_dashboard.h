@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Arduino_JSON.h>
+#include <ZuSi3Schnittstelle.h>
 #include <ZuSi3_TS_controls.h>
 
 extern int* G_DigitalOutGPIOPins;
