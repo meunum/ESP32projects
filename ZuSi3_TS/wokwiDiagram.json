@@ -6,7 +6,7 @@
     {
       "type": "board-esp32-devkit-c-v4",
       "id": "esp",
-      "top": -182.4,
+      "top": -211.2,
       "left": -465.56,
       "attrs": {}
     },
@@ -14,18 +14,19 @@
     {
       "type": "wokwi-led",
       "id": "led1",
-      "top": -301.2,
-      "left": -331.8,
-      "attrs": { "color": "magenta", "flip": "1" }
+      "top": -320.4,
+      "left": -361,
+      "attrs": { "color": "yellow", "flip": "1" }
     },
     {
       "type": "wokwi-resistor",
       "id": "r1",
-      "top": -188.6,
-      "left": -336.85,
+      "top": -227,
+      "left": -365.65,
       "rotate": 270,
       "attrs": { "value": "1000" }
-    }
+    },
+    { "type": "wokwi-microsd-card", "id": "sd1", "top": -76.57, "left": -345.53, "attrs": {} }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
@@ -33,9 +34,15 @@
     [ "pot1:VCC", "esp:3V3", "red", [ "v0" ] ],
     [ "pot1:GND", "esp:GND.2", "black", [ "v0" ] ],
     [ "pot1:SIG", "esp:VP", "white", [ "v0" ] ],
-    [ "esp:23", "led1:A", "white", [ "h0" ] ],
-    [ "esp:GND.2", "r1:1", "black", [ "v0" ] ],
-    [ "r1:2", "led1:C", "black", [ "v0" ] ]
+    [ "r1:2", "led1:C", "black", [ "v0" ] ],
+    [ "sd1:GND", "esp:GND.1", "black", [ "h0" ] ],
+    [ "sd1:VCC", "esp:5V", "red", [ "h0" ] ],
+    [ "sd1:CS", "esp:5", "#8f4814", [ "v0" ] ],
+    [ "sd1:DI", "esp:23", "orange", [ "v0" ] ],
+    [ "sd1:SCK", "esp:18", "blue", [ "v0" ] ],
+    [ "sd1:DO", "esp:19", "violet", [ "v0" ] ],
+    [ "esp:GND.3", "r1:1", "black", [ "h0" ] ],
+    [ "esp:21", "led1:A", "yellow", [ "h0" ] ]
   ],
   "dependencies": {}
 }

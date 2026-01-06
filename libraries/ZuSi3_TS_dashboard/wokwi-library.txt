@@ -1,3 +1,0 @@
-Arduino Library uploaded to Wokwi
-
-Simulate your ESP32, STM32, Arduino, and electronics projects on https://wokwi.com

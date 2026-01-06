@@ -2,48 +2,15 @@
 * Author:	Sebastian Wolf
 * Created:	August 2018
 */
-
 #include "Zusi3Schnittstelle.h"
 
-Zusi3Schnittstelle::Zusi3Schnittstelle(String ip, int port, String clientName) {
-	this->ip = ip;
-	this->port = port;
+Zusi3Schnittstelle::Zusi3Schnittstelle(NetworkClient *client, String clientName) {
+	this->client = client;
 	this->clientName = clientName;
-#if defined(ESP8266_Wifi) || defined(ESP32_Wifi)
-	client = new WiFiClient();
-#endif
-#ifdef ESP32_Ethernet
-	client = new WiFiClient();
-#endif
-#ifdef Ethernet_Shield
-	client = new EthernetClient();
-#endif
-#ifdef AVR_Wifi
-	client = new WiFiClient();
-#endif
 }
 
 boolean Zusi3Schnittstelle::connect() {
-#ifdef ESP8266_Wifi
-	boolean state = client->connect(ip, port);
-#endif
-#ifdef ESP32_Wifi
-	char constCharIP[sizeof(ip)];
-	ip.toCharArray(constCharIP, sizeof(constCharIP));
-	boolean state = client->connect(constCharIP, port);
-#endif
-#ifdef ESP32_Ethernet
-	char constCharIP[sizeof(ip)];
-	ip.toCharArray(constCharIP, sizeof(constCharIP));
-	boolean state = client->connect(constCharIP, port);
-#endif
-#ifdef Ethernet_Shield
-	boolean state = (boolean) client->connect(ip.c_str(), port);
-#endif
-#ifdef AVR_Wifi
-	boolean state = client->connect(ip, port);
-#endif
-	if (state) {
+	if (client->connected()) {
 		HELLO();
 		ACK_HELLO();
 		NEEDED_DATA();
