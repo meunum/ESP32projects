@@ -59,9 +59,9 @@ INPUT Fahrschalter Stufe 0
 4 0 0 0# Attribut 4 Bytes
 3 0# ID 3 Tastaturaktion
 7 0#
-4 0 0 0# Attribut 4 Bytes
+4 0 0 0# Attribut 6 Bytes
 4 0# ID 4 Schalterposition
-0 0#
+0 0 0 0#
 4 0 0 0# Attribut 4 Bytes
 5 0# ID 5 Parameter
 0 0#

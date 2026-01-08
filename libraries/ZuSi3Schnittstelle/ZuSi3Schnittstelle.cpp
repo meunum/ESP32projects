@@ -4,13 +4,16 @@
 */
 #include "Zusi3Schnittstelle.h"
 
-Zusi3Schnittstelle::Zusi3Schnittstelle(NetworkClient *client, String clientName) {
+Zusi3Schnittstelle::Zusi3Schnittstelle(NetworkClient *client, String clientName) 
+{
 	this->client = client;
 	this->clientName = clientName;
 }
 
-boolean Zusi3Schnittstelle::connect() {
-	if (client->connected()) {
+boolean Zusi3Schnittstelle::connect() 
+{
+	if (client->connected()) 
+	{
 		HELLO();
 		ACK_HELLO();
 		NEEDED_DATA();
@@ -20,18 +23,21 @@ boolean Zusi3Schnittstelle::connect() {
 	return false;
 }
 
-Zusi3Schnittstelle::~Zusi3Schnittstelle() {
+Zusi3Schnittstelle::~Zusi3Schnittstelle() 
+{
 	delete HEADER;
 	delete ENDE;
 	delete client;
 	delete requestListFuehrerstandsanzeigen;
 }
 
-void Zusi3Schnittstelle::close() {
+void Zusi3Schnittstelle::close() 
+{
 	client->stop();
 }
 
-void Zusi3Schnittstelle::requestFuehrerstandsanzeigen(int request) {
+void Zusi3Schnittstelle::requestFuehrerstandsanzeigen(int request) 
+{
 	requestListFuehrerstandsanzeigen->add(request);
 }
 
@@ -39,47 +45,58 @@ void Zusi3Schnittstelle::reqFstAnz(int request) {
 	requestFuehrerstandsanzeigen(request);
 }
 
-void Zusi3Schnittstelle::requestFuehrerstandsbedienung(boolean value) {
+void Zusi3Schnittstelle::requestFuehrerstandsbedienung(boolean value) 
+{
 	reqFuehrerstandsbedienung = value;
 }
 
-void Zusi3Schnittstelle::requestProgrammdaten(boolean value) {
+void Zusi3Schnittstelle::requestProgrammdaten(boolean value) 
+{
 	reqProgrammdaten = value;
 }
 
-void Zusi3Schnittstelle::requestProgrammdatenOhneFahrplan(boolean value) {
+void Zusi3Schnittstelle::requestProgrammdatenOhneFahrplan(boolean value) 
+{
 	reqProgrammdatenOhneFahrplan = value;
 }
 
-void Zusi3Schnittstelle::setDebugOutput(boolean output) {
+void Zusi3Schnittstelle::setDebugOutput(boolean output) 
+{
 	debugOutput = output;
 }
 
-String Zusi3Schnittstelle::getZusiVersion() {
+String Zusi3Schnittstelle::getZusiVersion() 
+{
 	return versionZusi;
 }
 
-String Zusi3Schnittstelle::getVerbindungsinfo() {
+String Zusi3Schnittstelle::getVerbindungsinfo() 
+{
 	return verbindungsinfoZusi;
 }
 
 Node *Zusi3Schnittstelle::update() {
-	if (node != NULL) {
+	if (node != NULL) 
+	{
 		delete node;
 		node = NULL;
 	}
-	if (!client->connected()) {
-		if (debugOutput) {
+	if (!client->connected()) 
+	{
+		if (debugOutput) 
+		{
 			Serial.print("Verbindungsaufbau (");
 			Serial.print(reconnectCounter);
 			Serial.print(")\n");
 		}
 		reconnectCounter++;
-		if (connect()) {
+		if (connect()) 
+		{
 			reconnectCounter = 1;
 		}
 	}
-	if (client->available() > 19) {
+	if (client->available() > 19) 
+	{
 		byte *header = new byte[4];
 		client->read(header, 4);
 		delete header;
@@ -93,7 +110,8 @@ Node *Zusi3Schnittstelle::update() {
 	return NULL;
 }
 
-void Zusi3Schnittstelle::HELLO() {
+void Zusi3Schnittstelle::HELLO() 
+{
 	Node *verbindungsaufbau = new Node(1);
 		Node *befehl_HELLO = new Node(1);
 			Attribute *protokoll_Version = new Attribute(1, 2);
@@ -112,8 +130,10 @@ void Zusi3Schnittstelle::HELLO() {
 	//delete verbindungsaufbau; //Absturzgrund bei dem ESP32
 }
 
-void Zusi3Schnittstelle::ACK_HELLO() {
-	while (client->available() < 10) {
+void Zusi3Schnittstelle::ACK_HELLO() 
+{
+	while (client->available() < 10) 
+	{
 		delay(250);
 	}
 	byte *header = new byte[4];
@@ -121,7 +141,8 @@ void Zusi3Schnittstelle::ACK_HELLO() {
 	byte *id = new byte[2];
 	client->read(id, 2);
 	Node *verbindungsaufbau = getNodes(id);
-	if (verbindungsaufbau->getIDAsInt() == 0x01) {
+	if (verbindungsaufbau->getIDAsInt() == 0x01) 
+	{
 		Node *befehl_ACK_HELLO = verbindungsaufbau->getNodeByID(0x02);
 		if (befehl_ACK_HELLO != NULL) {
 			int client_Aktzeptiert = befehl_ACK_HELLO->getAttributeByID(3)->getDATAAsInt();
@@ -143,7 +164,8 @@ void Zusi3Schnittstelle::ACK_HELLO() {
 	delete verbindungsaufbau;
 }
 
-void Zusi3Schnittstelle::NEEDED_DATA() {
+void Zusi3Schnittstelle::NEEDED_DATA() 
+{
 	Node *client_Anwendung = new Node(0x02);
 		Node *befehl_NEEDED_DATA = new Node(0x03);
 			Node *untergruppe_Fuehrerstandsanzeigen = new Node(0x0A);
@@ -176,7 +198,8 @@ void Zusi3Schnittstelle::NEEDED_DATA() {
 	delete client_Anwendung;
 }
 
-void Zusi3Schnittstelle::ACK_NEEDED_DATA() {
+void Zusi3Schnittstelle::ACK_NEEDED_DATA() 
+{
 	while (client->available() < 10) {
 		delay(250);
 	}
@@ -201,7 +224,8 @@ void Zusi3Schnittstelle::ACK_NEEDED_DATA() {
 	delete Client_Anwendung_02;
 }
 
-Node *Zusi3Schnittstelle::getNodes(byte *rootID) {
+Node *Zusi3Schnittstelle::getNodes(byte *rootID) 
+{
 	Node *rootNode = new Node(rootID);
 	while (client->available() > 0) {
 		byte header[4];
@@ -268,9 +292,12 @@ void Zusi3Schnittstelle::sendTastatureingaben()
 	}
 }
 
-boolean Zusi3Schnittstelle::compare(byte * a, byte * b, int size) {
-	for (int i = 0; i < size; i++) {
-		if (a[i] != b[i]) {
+boolean Zusi3Schnittstelle::compare(byte * a, byte * b, int size) 
+{
+	for (int i = 0; i < size; i++) 
+	{
+		if (a[i] != b[i]) 
+		{
 			return false;
 		}
 	}
