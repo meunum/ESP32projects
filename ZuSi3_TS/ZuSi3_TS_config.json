@@ -1,5 +1,11 @@
 {
 	"ZuSi3_TS_config": {
+		"system": {
+			"server": {
+				"ipAddresse": "192.168.178.65",
+				"portNummer": 1436
+			}
+		},
 		"hardware": {
 			"steuerelemente": [
 				{

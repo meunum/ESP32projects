@@ -1,0 +1,9 @@
+{
+	"system": {
+		"wifi": {
+#				"SSID": "Wokwi-GUEST",
+			"SSID": "FRITZ!Box 7590 BI",
+			"password": "28149516463916020556"
+		}
+	}
+}
