@@ -17,7 +17,7 @@ void setup() {
 	Serial.begin(115200);
 //	if (DEV_Module_Init() == 0) { } else { Serial.println("GPIO Init Fail!"); exit(0); }
 //	ConnectWifi();
-//	dashBoard.InitNetwork(wifiClient);
+//	dashBoard.SetNetworkClient(wifiClient);
 
 	if (!sd.begin(CS_PIN, SPI_SPEED)) {
 		Serial.println("Error sd.begin().");
@@ -31,7 +31,8 @@ void setup() {
 	}
 	
 	char* configData = readFile("config.json");
-	dashBoard.SetConfig(configData);
+
+	dashBoard.Init(configData, wifiClient);
 	
 	for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
 	{
@@ -45,7 +46,7 @@ void setup() {
 		NULL,						// Parameters
 		1,							// Priority
 		&UpdateTaskHandle,	// Task handle
-									// Core
+		1							// Core
 	);
 }
 
