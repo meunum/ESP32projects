@@ -1,6 +1,7 @@
 {
 	"ZuSi3_TS_config": {
 		"system": {
+			"clientName": "ZuSi3_TS_Dashboard",
 			"server": {
 				"ipAddresse": "192.168.178.65",
 				"portNummer": 1436

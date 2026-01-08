@@ -16,7 +16,8 @@ TaskHandle_t UpdateTaskHandle = NULL;
 void setup() {
 	Serial.begin(115200);
 //	if (DEV_Module_Init() == 0) { } else { Serial.println("GPIO Init Fail!"); exit(0); }
-//	ConnectToZuSi();
+//	ConnectWifi();
+//	dashBoard.InitNetwork(wifiClient);
 
 	if (!sd.begin(CS_PIN, SPI_SPEED)) {
 		Serial.println("Error sd.begin().");
@@ -69,7 +70,7 @@ void UpdateTask(void *parameter) {
 	}
 }
 
-void ConnectToZuSi()
+void ConnectWifi()
 {
 	JSONVar config = JSON.parse(configJson);
 	if (JSON.typeof(config) == "undefined") { Serial.println("Parsing config json failed!"); return null; }
@@ -89,8 +90,6 @@ void ConnectToZuSi()
 	
 	Serial.println("IP: " + WiFi.localIP().toString());
 	Serial.print("Gateway IP: "); Serial.println(WiFi.gatewayIP());
-	
-	dashBoard.InitNetwork(wifiClient);
 }
 
 char* readFile(String name)

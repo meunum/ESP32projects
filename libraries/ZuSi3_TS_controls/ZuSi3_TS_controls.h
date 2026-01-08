@@ -32,6 +32,7 @@ public:
   virtual int GetWert();
   virtual void SetWert(int value);
   void SetTastaturZuordnung(int value);
+  int GetTastaturZuordnung();
   virtual void Update();
   
 private:

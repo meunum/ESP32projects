@@ -13,7 +13,8 @@ class ZuSi3_TS_DashBoard
 {
 public:
 	ZuSi3_TS_DashBoard();
-	void InitNetwork(NetworkClient *client);
+	void Init(String config, NetworkClient *nwclient);
+	void SetNetworkClient(NetworkClient *client);
 	void SetConfig(String config_json);
 	void SetBaureihe(String name);
 	void AddControl(ZuSi3_TS_Control* control);
@@ -29,13 +30,15 @@ private:
 	void loadHardwareConfig(JSONVar config);
 	void loadBaureihenConfig(JSONVar config, String baureihe);
 	String configJson = "";
+	String clientName;
 	String baureihe = "default";
 	int analogInGPIOLength = 0;
 	int digitalOutGPIOLength = 0;
 	int prevStufe = 0;
 	float prevAnalogValue = 0;
 	int motorHold = 0;
-	NetworkClient *networkClient;
 	String serverAdresse;
 	String serverPortnummer;
+	NetworkClient *networkClient;
+	Zusi3Schnittstelle *zusiClient;
 };
