@@ -3,8 +3,7 @@
 #include <WiFi.h>
 #include <SdFat.h>
 #include <ZuSi3_TS_dashboard.h>
-//#include <esp_wifi.h>
-//#include "DEV_Config.h"
+#include <driver/adc.h>
 
 #define SPI_SPEED SD_SCK_MHZ(4)
 const int CS_PIN = 5;
@@ -18,10 +17,11 @@ char* dashConfig = "{\"ZuSi3_TS_config\":{\"system\":{\"clientName\":\"ZuSi3_TS_
 
 void setup() {
 	Serial.begin(115200);
-	if (DEV_Module_Init() == 0) { } else { Serial.println("GPIO Init Fail!"); exit(0); }
 
-	pinMode(36, OUTPUT);
-	digitalWrite(36, HIGH);
+	adc1_config_width(ADC_WIDTH_12Bit);
+	adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_DB_11);
+	pinMode(35, OUTPUT);
+	digitalWrite(35, HIGH);
 
 	ConnectWifi();
 
