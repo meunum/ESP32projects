@@ -18,8 +18,9 @@ char* dashConfig = "{\"ZuSi3_TS_config\":{\"system\":{\"clientName\":\"ZuSi3_TS_
 
 void setup() {
 	Serial.begin(115200);
+	if (DEV_Module_Init() == 0) { } else { Serial.println("GPIO Init Fail!"); exit(0); }
 
-    pinMode(36, OUTPUT);
+	pinMode(36, OUTPUT);
 	digitalWrite(36, HIGH);
 
 	ConnectWifi();
