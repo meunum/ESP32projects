@@ -6,11 +6,6 @@ int* G_AnalogInGPIOPins;
 int* G_DigitalOutGPIOData;
 float* G_AnalogInGPIOData;
 
-void ZuSi3_TS_Control::SetTastaturZuordnung(int value)
-{
-  tastaturZuordnung = value;
-}
-
 void ZuSi3_TS_Control::Update()
 {
 }
@@ -18,10 +13,6 @@ void ZuSi3_TS_Control::Update()
 int ZuSi3_TS_Control::GetWert()
 {
 	return -32.768;
-}
-
-void ZuSi3_TS_Control::SetWert(int value)
-{
 }
 
 DynamischerStufenSchalter::DynamischerStufenSchalter(String name, int enaIndex, int dirIndex, int stepIndex, int analogIndex, float analogMin, float analogMax)

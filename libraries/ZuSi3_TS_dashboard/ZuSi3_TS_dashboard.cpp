@@ -1,27 +1,51 @@
 #define DEBUG
 #include <ZuSi3_TS_dashboard.h>
 
+void debugPrint(String text){
+	#ifdef DEBUG 
+	Serial.print(text);
+	#endif
+	}
+void debugPrintln(String text){
+	#ifdef DEBUG 
+	Serial.println(text);
+	#endif
+	}
+void debugPrintln(int zahl){
+	#ifdef DEBUG 
+	Serial.println(zahl);
+	#endif
+	}
+void debugPrintlnJV(JSONVar jsonvar){
+	#ifdef DEBUG 
+	Serial.println(jsonvar);
+	#endif
+	}
+
 ZuSi3_TS_DashBoard::ZuSi3_TS_DashBoard()
 {
 }
 
-void ZuSi3_TS_DashBoard::Init(String config, NetworkClient *nwclient);
+void ZuSi3_TS_DashBoard::Init(String config, NetworkClient *nwclient)
 {
-	debugPrint("ZuSi3_TS_DashBoard::Init");
+	debugPrintln("ZuSi3_TS_DashBoard::Init");
 	
 	SetConfig(config);
 	SetNetworkClient(nwclient);
 	zusiClient = new Zusi3Schnittstelle(networkClient, clientName);
 }
 
-void ZuSi3_TS_DashBoard::SetNetworkClient(NetworkClient *client);
+void ZuSi3_TS_DashBoard::SetNetworkClient(NetworkClient *client)
 {
-	debugPrint("ZuSi3_TS_DashBoard::SetNetworkClient");
+	debugPrintln("ZuSi3_TS_DashBoard::SetNetworkClient");
 	
 	networkClient = client;
 	Serial.print("Verbinden mit ZuSi ...");
 	
-	if(!networkClient->connect(serverAdresse, serverPortnummer))
+	IPAddress ip;
+	ip.fromString(serverAdresse);
+	
+	if(!networkClient->connect(ip, serverPortnummer))
 	{
 		Serial.println(" ZuSi-Server verbunden");
 	}
@@ -33,6 +57,8 @@ void ZuSi3_TS_DashBoard::SetNetworkClient(NetworkClient *client);
 
 void ZuSi3_TS_DashBoard::Update()
 {
+	//debugPrintln("ZuSi3_TS_DashBoard::Update");
+
 	for(int i = 0; i < ControlCount; i++)
 	{
 		Controls[i]->Update();
@@ -47,7 +73,7 @@ void ZuSi3_TS_DashBoard::Update()
 				zusiClient->inputSchalterposition(Controls[i]->GetTastaturZuordnung(), stufe);
 			}
 			
-			debugPrint(Controls[i]->ControlName + " Stufe: "); debugPrint(stufe);
+			debugPrint(Controls[i]->ControlName + " Stufe: "); debugPrintln(stufe);
 		}
 	}
 }
@@ -59,7 +85,7 @@ void ZuSi3_TS_DashBoard::AddControl(ZuSi3_TS_Control* control)
 
 void ZuSi3_TS_DashBoard::SetConfig(String config_json)
 {
-	debugPrint("ZuSi3_TS_DashBoard::SetConfig");
+	debugPrintln("ZuSi3_TS_DashBoard::SetConfig");
 	
 	configJson = config_json;
 	JSONVar config = parseConfig();
@@ -71,7 +97,7 @@ void ZuSi3_TS_DashBoard::SetConfig(String config_json)
 
 void ZuSi3_TS_DashBoard::SetBaureihe(String name)
 {
-	debugPrint("ZuSi3_TS_DashBoard::SetBaureihe");
+	debugPrintln("ZuSi3_TS_DashBoard::SetBaureihe");
 
 	baureihe = name;
 	
@@ -85,24 +111,24 @@ void ZuSi3_TS_DashBoard::SetBaureihe(String name)
 
 JSONVar ZuSi3_TS_DashBoard::parseConfig()
 {
-	debugPrint("ZuSi3_TS_DashBoard::parseConfig");
+	debugPrintln("ZuSi3_TS_DashBoard::parseConfig");
 	
 	JSONVar config = JSON.parse(configJson);
-	if (JSON.typeof(config) == "undefined") { debugPrint("Parsing config json failed!"); return null; }
+	if (JSON.typeof(config) == "undefined") { debugPrintln("Parsing config json failed!"); return null; }
 	return config;
 }
 
 void ZuSi3_TS_DashBoard::loadSystemConfig(JSONVar config)
 {
-	debugPrint("ZuSi3_TS_DashBoard::loadSystemConfig");
+	debugPrintln("ZuSi3_TS_DashBoard::loadSystemConfig");
 	
 	JSONVar systemConfig = config["ZuSi3_TS_config"]["system"];
-	if (systemConfig == nullptr) { debugPrint("Systemkonfiguration nicht gefunden"); return; }
-	clientName = systemConfig["clientName"];
+	if (systemConfig == nullptr) { debugPrintln("Systemkonfiguration nicht gefunden"); return; }
+	clientName = (String)systemConfig["clientName"];
 
 	JSONVar serverConfig = systemConfig["server"];
-	if (serverConfig == nullptr) { debugPrint("Netzwerkkonfiguration nicht gefunden"); return; }
-	serverAdresse = serverConfig["ipAddresse"];
+	if (serverConfig == nullptr) { debugPrintln("Netzwerkkonfiguration nicht gefunden"); return; }
+	serverAdresse = (String)serverConfig["ipAddresse"];
 	serverPortnummer = serverConfig["portNummer"];
 	
 	delete systemConfig;
@@ -111,10 +137,11 @@ void ZuSi3_TS_DashBoard::loadSystemConfig(JSONVar config)
 
 void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
 {
-	debugPrint("ZuSi3_TS_DashBoard::loadHardwareConfig");
+	debugPrintln("ZuSi3_TS_DashBoard::loadHardwareConfig");
 	
 	JSONVar controlsConfig = config["ZuSi3_TS_config"]["hardware"]["steuerelemente"];
-	if (controlsConfig == nullptr) { debugPrint("Hardware-Steuerelementekonfiguration nicht gefunden"); return; }
+	if (controlsConfig == nullptr) { debugPrintln("Hardware-Steuerelementekonfiguration nicht gefunden"); return; }
+
 	int controlCount = controlsConfig.length();
 	int digitalPinCount = 0;
 	int analogPinCount = 0;
@@ -144,7 +171,7 @@ void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
 	{
 		JSONVar elementConfig = controlsConfig[i];
 		
-		debugPrint(elementConfig);
+		debugPrint("element: "); debugPrintlnJV(elementConfig);
 		
 		String name = elementConfig["name"];
 		String klasse = elementConfig["klasse"];
@@ -156,7 +183,9 @@ void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
 			G_DigitalOutGPIOPins[digitalGpioPinIndex] = (int) gpio["dir"]; int dirIndex = digitalGpioPinIndex++;
 			G_DigitalOutGPIOPins[digitalGpioPinIndex] = (int) gpio["step"]; int stepIndex = digitalGpioPinIndex++;
 			G_AnalogInGPIOPins[analogGpioPinIndex] = (int) gpio["sensor"]; int sensorIndex = analogGpioPinIndex++;
-		
+
+			Serial.print("G_AnalogInGPIOPins[");Serial.print(analogGpioPinIndex-1);Serial.print("] = ");Serial.println(G_AnalogInGPIOPins[analogGpioPinIndex-1]);
+			
 			JSONVar kal = elementConfig["kalibrierung"];
 			int analogMin = (int) kal["min"];
 			int analogMax = (int) kal["max"];
@@ -175,16 +204,16 @@ void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
 
 void ZuSi3_TS_DashBoard::loadBaureihenConfig(JSONVar config, String baureihe)
 {
-	debugPrint("ZuSi3_TS_DashBoard::loadBaureihenConfig");
+	debugPrintln("ZuSi3_TS_DashBoard::loadBaureihenConfig");
 	
 	JSONVar controlsConfig = config["ZuSi3_TS_config"]["baureihen"][baureihe]["steuerelemente"];
-	if (controlsConfig == nullptr) { debugPrint("Steuerelementekonfiguration der Baureihe nicht gefunden: " + baureihe); return; }
+	if (controlsConfig == nullptr) { debugPrintln("Steuerelementekonfiguration der Baureihe nicht gefunden: " + baureihe); return; }
 
 	for (int i = 0; i < controlsConfig.length(); i++)
 	{
 		JSONVar elementConfig = controlsConfig[i];
 
-		debugPrint(elementConfig);
+		debugPrint("element: "); debugPrintlnJV(elementConfig);
 
 		String name = elementConfig["name"];
 		for(int j = 0; j < ControlCount; j++)
@@ -218,11 +247,4 @@ void ZuSi3_TS_DashBoard::loadBaureihenConfig(JSONVar config, String baureihe)
 	}
 	
 	delete controlsConfig;
-}
-
-void debugPrint(String text);
-{
-#ifdef DEBUG
-		debugPrint(text);
-#endif
 }

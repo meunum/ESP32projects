@@ -30,9 +30,8 @@ public:
   String ControlName;
   String Class;
   virtual int GetWert();
-  virtual void SetWert(int value);
-  void SetTastaturZuordnung(int value);
-  int GetTastaturZuordnung();
+  void SetTastaturZuordnung(int value) { tastaturZuordnung = value; };
+  int GetTastaturZuordnung() { return tastaturZuordnung; };
   virtual void Update();
   
 private:

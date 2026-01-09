@@ -13,14 +13,14 @@
 					"name": "stufenschalter_1",
 					"klasse": "DynamischerStufenSchalter",
 					"gpio": {
-						"ena": 21,
-						"dir": 10,
-						"step": 11,
+						"ena": 0,
+						"dir": 0,
+						"step": 0,
 						"sensor": 36
 					},
 					"kalibrierung": {
-						"min": 685,
-						"max": 3415
+						"min": 0,
+						"max": 3200
 					}
 				}
 			]

@@ -13,11 +13,16 @@ WiFiClient wifiClient;
 ZuSi3_TS_DashBoard dashBoard;
 TaskHandle_t UpdateTaskHandle = NULL;
 
+char* sysConfig = "{\"system\":{\"wifi\":{\"SSID\":\"FRITZ!Box 7590 BI\",\"password\":\"28149516463916020556\"}}}";
+char* dashConfig = "{\"ZuSi3_TS_config\":{\"system\":{\"clientName\":\"ZuSi3_TS_Dashboard\",\"server\":{\"ipAddresse\":\"192.168.178.65\",\"portNummer\":1436}},\"hardware\":{\"steuerelemente\":[{\"name\":\"stufenschalter_1\",\"klasse\":\"DynamischerStufenSchalter\",\"gpio\":{\"ena\":0,\"dir\":0,\"step\":0,\"sensor\":35},\"kalibrierung\":{\"min\":685,\"max\":3415}}]},\"baureihen\":{\"default\":{\"steuerelemente\":[{\"name\":\"stufenschalter_1\",\"verwendung\":\"Fahrstufe\",\"tastaturZuordnung\":\"1\",\"stufen\":15}]},\"BR118\":{},\"BR154\":{}}}}";
+
 void setup() {
 	Serial.begin(115200);
-//	if (DEV_Module_Init() == 0) { } else { Serial.println("GPIO Init Fail!"); exit(0); }
-//	ConnectWifi();
-//	dashBoard.SetNetworkClient(wifiClient);
+
+    pinMode(36, OUTPUT);
+	digitalWrite(36, HIGH);
+
+	ConnectWifi();
 
 	if (!sd.begin(CS_PIN, SPI_SPEED)) {
 		Serial.println("Error sd.begin().");
@@ -30,11 +35,11 @@ void setup() {
 		}
 	}
 	
-	char* configData = readFile("config.json");
+	char* configData = readFile("ZuSi3_TS_config.json");
 
-	dashBoard.Init(configData, wifiClient);
+	dashBoard.Init(configData, &wifiClient);
 	
-	for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
+	for(int i = 0; i < dashBoard.DigitalOutGPIOLength; i++)
 	{
 		pinMode(G_DigitalOutGPIOPins[i], OUTPUT);
 	}
@@ -60,6 +65,7 @@ void UpdateTask(void *parameter) {
 		for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
 		{
 			G_AnalogInGPIOData[i] = analogRead(G_AnalogInGPIOPins[i]);
+			Serial.print("G_AnalogInGPIOData[");Serial.print(i);Serial.print("] = ");Serial.println(G_AnalogInGPIOData[i]);	delay(100);
 		}
 		
 		dashBoard.Update();
@@ -73,32 +79,45 @@ void UpdateTask(void *parameter) {
 
 void ConnectWifi()
 {
+	char* configJson = readFile("systemConfig.json");
 	JSONVar config = JSON.parse(configJson);
-	if (JSON.typeof(config) == "undefined") { Serial.println("Parsing config json failed!"); return null; }
+	if (JSON.typeof(config) == "undefined") { Serial.println("Parsing sysemConfig.json failed!"); return; }
 	
+	String SSID = config["system"]["wifi"]["SSID"];
+	String pwd = config["system"]["wifi"]["password"];
+
+	Serial.println();
+	Serial.print("WiFi SSID: "); Serial.print(SSID); Serial.print("; password: "); Serial.println(pwd);
 	Serial.print("Connecting WiFi ");
+
+	WiFi.begin(SSID, pwd);
 	
-	WiFi.begin(SSID, WPA2PWD);
-	WiFi.mode(WIFI_STA);
-	
-	while (WiFi.status() != WL_CONNECTED) {
+	while (WiFi.status() != WL_CONNECTED) 
+	{
 		delay(100);
 		Serial.print(".");
 	}
+
 	Serial.println(" Connected!");
 	
 	while (WiFi.localIP().toString() == "0.0.0.0") { delay(100); }
+	
+	delete config;
 	
 	Serial.println("IP: " + WiFi.localIP().toString());
 	Serial.print("Gateway IP: "); Serial.println(WiFi.gatewayIP());
 }
 
-char* readFile(String name)
+char* readFile(char* name)
 {
+	if(name=="ZuSi3_TS_config.json") return dashConfig;
+	if(name=="systemConfig.json") return sysConfig;
+
 	File32 file;
 	
 	if (!file.open(name, O_READ)) {
-		sd.errorHalt("opening file '" + name + "' failed");
+		Serial.println(name);
+		sd.errorHalt("opening file failed");
 	}
 	
 	char* data;
