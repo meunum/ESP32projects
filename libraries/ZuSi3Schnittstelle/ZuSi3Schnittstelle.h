@@ -37,6 +37,8 @@ private:
 	void ACK_HELLO();
 	void NEEDED_DATA();
 	void ACK_NEEDED_DATA();
+	void checkConnection();
+
 	Node *getNodes(byte *rootID);
 	boolean compare(byte *a, byte *b, int size);
 

@@ -1,26 +1,5 @@
-#define DEBUG
+#include "debug.h"
 #include <ZuSi3_TS_dashboard.h>
-
-void debugPrint(String text){
-	#ifdef DEBUG 
-	Serial.print(text);
-	#endif
-	}
-void debugPrintln(String text){
-	#ifdef DEBUG 
-	Serial.println(text);
-	#endif
-	}
-void debugPrintln(int zahl){
-	#ifdef DEBUG 
-	Serial.println(zahl);
-	#endif
-	}
-void debugPrintlnJV(JSONVar jsonvar){
-	#ifdef DEBUG 
-	Serial.println(jsonvar);
-	#endif
-	}
 
 ZuSi3_TS_DashBoard::ZuSi3_TS_DashBoard()
 {
@@ -28,36 +7,33 @@ ZuSi3_TS_DashBoard::ZuSi3_TS_DashBoard()
 
 void ZuSi3_TS_DashBoard::Init(String config, NetworkClient *nwclient)
 {
-	debugPrintln("ZuSi3_TS_DashBoard::Init");
+	debug::println("ZuSi3_TS_DashBoard::Init");
 	
 	SetConfig(config);
 	SetNetworkClient(nwclient);
 	zusiClient = new Zusi3Schnittstelle(networkClient, clientName);
+	zusiClient->connect();
 }
 
 void ZuSi3_TS_DashBoard::SetNetworkClient(NetworkClient *client)
 {
-	debugPrintln("ZuSi3_TS_DashBoard::SetNetworkClient");
+	debug::print("ZuSi3_TS_DashBoard::SetNetworkClient IP-Adresse: "); debug::print(serverAdresse); debug::print(" Port: "); debug::println(serverPortnummer);
 	
 	networkClient = client;
-	Serial.print("Verbinden mit ZuSi ...");
+	debug::print("Verbinden mit ZuSi ... ");
 	
 	IPAddress ip;
 	ip.fromString(serverAdresse);
 	
-	if(!networkClient->connect(ip, serverPortnummer))
-	{
-		Serial.println(" ZuSi-Server verbunden");
-	}
-	else
-	{
-		Serial.println(" Verbindung fehlgeschlagen!");
-	}
+	networkClient->connect(ip, serverPortnummer);
+	delay(1000);
+	
+	debug::println("");
 }
 
 void ZuSi3_TS_DashBoard::Update()
 {
-	//debugPrintln("ZuSi3_TS_DashBoard::Update");
+	//debug::println("ZuSi3_TS_DashBoard::Update");
 
 	for(int i = 0; i < ControlCount; i++)
 	{
@@ -66,16 +42,18 @@ void ZuSi3_TS_DashBoard::Update()
 		
 		if(stufe != prevStufe)
 		{
+			debug::print(Controls[i]->ControlName + " Stufe: "); debug::println(stufe);
+
 			prevStufe = stufe;
 			
 			if(zusiClient != nullptr)
 			{
 				zusiClient->inputSchalterposition(Controls[i]->GetTastaturZuordnung(), stufe);
 			}
-			
-			debugPrint(Controls[i]->ControlName + " Stufe: "); debugPrintln(stufe);
 		}
 	}
+	
+	zusiClient->sendTastatureingaben();
 }
 
 void ZuSi3_TS_DashBoard::AddControl(ZuSi3_TS_Control* control)
@@ -85,7 +63,7 @@ void ZuSi3_TS_DashBoard::AddControl(ZuSi3_TS_Control* control)
 
 void ZuSi3_TS_DashBoard::SetConfig(String config_json)
 {
-	debugPrintln("ZuSi3_TS_DashBoard::SetConfig");
+	debug::println("ZuSi3_TS_DashBoard::SetConfig");
 	
 	configJson = config_json;
 	JSONVar config = parseConfig();
@@ -97,7 +75,7 @@ void ZuSi3_TS_DashBoard::SetConfig(String config_json)
 
 void ZuSi3_TS_DashBoard::SetBaureihe(String name)
 {
-	debugPrintln("ZuSi3_TS_DashBoard::SetBaureihe");
+	debug::println("ZuSi3_TS_DashBoard::SetBaureihe");
 
 	baureihe = name;
 	
@@ -111,23 +89,23 @@ void ZuSi3_TS_DashBoard::SetBaureihe(String name)
 
 JSONVar ZuSi3_TS_DashBoard::parseConfig()
 {
-	debugPrintln("ZuSi3_TS_DashBoard::parseConfig");
+	debug::println("ZuSi3_TS_DashBoard::parseConfig");
 	
 	JSONVar config = JSON.parse(configJson);
-	if (JSON.typeof(config) == "undefined") { debugPrintln("Parsing config json failed!"); return null; }
+	if (JSON.typeof(config) == "undefined") { debug::println("Parsing config json failed!"); return null; }
 	return config;
 }
 
 void ZuSi3_TS_DashBoard::loadSystemConfig(JSONVar config)
 {
-	debugPrintln("ZuSi3_TS_DashBoard::loadSystemConfig");
+	debug::println("ZuSi3_TS_DashBoard::loadSystemConfig");
 	
 	JSONVar systemConfig = config["ZuSi3_TS_config"]["system"];
-	if (systemConfig == nullptr) { debugPrintln("Systemkonfiguration nicht gefunden"); return; }
+	if (systemConfig == nullptr) { debug::println("Systemkonfiguration nicht gefunden"); return; }
 	clientName = (String)systemConfig["clientName"];
 
 	JSONVar serverConfig = systemConfig["server"];
-	if (serverConfig == nullptr) { debugPrintln("Netzwerkkonfiguration nicht gefunden"); return; }
+	if (serverConfig == nullptr) { debug::println("Netzwerkkonfiguration nicht gefunden"); return; }
 	serverAdresse = (String)serverConfig["ipAddresse"];
 	serverPortnummer = serverConfig["portNummer"];
 	
@@ -137,10 +115,10 @@ void ZuSi3_TS_DashBoard::loadSystemConfig(JSONVar config)
 
 void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
 {
-	debugPrintln("ZuSi3_TS_DashBoard::loadHardwareConfig");
+	debug::println("ZuSi3_TS_DashBoard::loadHardwareConfig");
 	
 	JSONVar controlsConfig = config["ZuSi3_TS_config"]["hardware"]["steuerelemente"];
-	if (controlsConfig == nullptr) { debugPrintln("Hardware-Steuerelementekonfiguration nicht gefunden"); return; }
+	if (controlsConfig == nullptr) { debug::println("Hardware-Steuerelementekonfiguration nicht gefunden"); return; }
 
 	int controlCount = controlsConfig.length();
 	int digitalPinCount = 0;
@@ -171,7 +149,7 @@ void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
 	{
 		JSONVar elementConfig = controlsConfig[i];
 		
-		debugPrint("element: "); debugPrintlnJV(elementConfig);
+		debug::print("element: "); debug::printlnJV(elementConfig);
 		
 		String name = elementConfig["name"];
 		String klasse = elementConfig["klasse"];
@@ -204,29 +182,37 @@ void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
 
 void ZuSi3_TS_DashBoard::loadBaureihenConfig(JSONVar config, String baureihe)
 {
-	debugPrintln("ZuSi3_TS_DashBoard::loadBaureihenConfig");
+	debug::println("ZuSi3_TS_DashBoard::loadBaureihenConfig");
 	
 	JSONVar controlsConfig = config["ZuSi3_TS_config"]["baureihen"][baureihe]["steuerelemente"];
-	if (controlsConfig == nullptr) { debugPrintln("Steuerelementekonfiguration der Baureihe nicht gefunden: " + baureihe); return; }
+	if (controlsConfig == nullptr) { debug::println("Steuerelementekonfiguration der Baureihe nicht gefunden: " + baureihe); return; }
 
 	for (int i = 0; i < controlsConfig.length(); i++)
 	{
 		JSONVar elementConfig = controlsConfig[i];
 
-		debugPrint("element: "); debugPrintlnJV(elementConfig);
+		debug::print("element: "); debug::printlnJV(elementConfig);
 
 		String name = elementConfig["name"];
 		for(int j = 0; j < ControlCount; j++)
 		{
 			if (Controls[j]->ControlName == name)
 			{
+
+				debug::print("tastaturZuordnung JSON "); debug::printlnJV(elementConfig["tastaturZuordnung"]);
+				
+				int tastaturZuordnung = (int) elementConfig["tastaturZuordnung"];
+
+				debug::print("tastaturZuordnung "); debug::println(tastaturZuordnung);
+				
+				Controls[j]->SetTastaturZuordnung(tastaturZuordnung);
+
 				if(Controls[j]->Class == "DynamischerStufenSchalter")
 				{
 					DynamischerStufenSchalter* schalter = static_cast<DynamischerStufenSchalter*>(Controls[j]);
 					JSONVar kombi = elementConfig["kombischalter"];
 					if (kombi == nullptr | JSON.typeof(kombi) == "undefined")
 					{
-						schalter->SetTastaturZuordnung((int) elementConfig["tastaturZuordnung"]);
 						schalter->SetMaxStufe((int) elementConfig["stufen"]);
 					}
 					else

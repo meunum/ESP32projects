@@ -2,27 +2,57 @@
 #include <Arduino_JSON.h>
 #include <WiFi.h>
 #include <SdFat.h>
+#include <ADS1115_WE.h> 
 #include <ZuSi3_TS_dashboard.h>
 
+#define wireSdaPin 15
+#define wireSclPin 16
+#define _adsChannel ADS1115_COMP_0_GND // ADS1115_COMP_0_GND = 0x4000,
+#define _adsAdr 0x48
 #define SPI_SPEED SD_SCK_MHZ(4)
+
 const int CS_PIN = 5;
 SdFat32 sd;
 WiFiClient wifiClient;
+TwoWire adcWire = TwoWire(1);
+ADS1115_WE adc = ADS1115_WE(&adcWire, _adsAdr);
+bool adsAvailable = false;
 ZuSi3_TS_DashBoard dashBoard;
 TaskHandle_t UpdateTaskHandle = NULL;
 
 char* sysConfig = "{\"system\":{\"wifi\":{\"SSID\":\"FRITZ!Box 7590 BI\",\"password\":\"28149516463916020556\"}}}";
-char* dashConfig = "{\"ZuSi3_TS_config\":{\"system\":{\"clientName\":\"ZuSi3_TS_Dashboard\",\"server\":{\"ipAddresse\":\"192.168.178.65\",\"portNummer\":1436}},\"hardware\":{\"steuerelemente\":[{\"name\":\"stufenschalter_1\",\"klasse\":\"DynamischerStufenSchalter\",\"gpio\":{\"ena\":0,\"dir\":0,\"step\":0,\"sensor\":1},\"kalibrierung\":{\"min\":0,\"max\":4095}}]},\"baureihen\":{\"default\":{\"steuerelemente\":[{\"name\":\"stufenschalter_1\",\"verwendung\":\"Fahrstufe\",\"tastaturZuordnung\":1,\"stufen\":15}]},\"BR118\":{},\"BR154\":{}}}}";
+char* dashConfig = "{\"ZuSi3_TS_config\":{\"system\":{\"clientName\":\"ZuSi3_TS_Dashboard\",\"server\":{\"ipAddresse\":\"192.168.178.65\",\"portNummer\":1436}},\"hardware\":{\"steuerelemente\":[{\"name\":\"stufenschalter_1\",\"klasse\":\"DynamischerStufenSchalter\",\"gpio\":{\"ena\":0,\"dir\":0,\"step\":0,\"sensor\":4},\"kalibrierung\":{\"min\":685,\"max\":3415}}]},\"baureihen\":{\"default\":{\"steuerelemente\":[{\"name\":\"stufenschalter_1\",\"verwendung\":\"Fahrstufe\",\"tastaturZuordnung\":\"1\",\"stufen\":15}]},\"BR118\":{},\"BR154\":{}}}}";
 
 void setup() {
 	Serial.begin(115200);
 
+	adcWire.begin(wireSdaPin, wireSclPin);
+	adsAvailable = adc.init(_adsAdr);
+	if(adsAvailable) { Serial.println("ADS1115 connected."); } else { Serial.println("ADS1115 not connected!"); exit(0); }
+	adc.setVoltageRange_mV(ADS1115_RANGE_4096);
+	adc.setMeasureMode(ADS1115_CONTINUOUS); 
+	adc.setCompareChannels(_adsChannel);
+
 	ConnectWifi();
-	initSdCard();
-	initGPIO();
+
+	if (!sd.begin(CS_PIN, SPI_SPEED)) {
+		Serial.println("Error sd.begin().");
+		if (sd.card()->errorCode()) {
+			Serial.println("SD initialization failed.");
+		} else if (sd.vol()->fatType() == 0) {
+			Serial.println("Can't find a valid FAT16/FAT32 partition.");
+		} else {
+			Serial.println("Can't determine error type");
+		}
+	}
 	
 	char* configData = readFile("ZuSi3_TS_config.json");
 	dashBoard.Init(configData, &wifiClient);
+	
+	for(int i = 0; i < dashBoard.DigitalOutGPIOLength; i++)
+	{
+		pinMode(G_DigitalOutGPIOPins[i], OUTPUT);
+	}
 	
 	xTaskCreatePinnedToCore(
 		UpdateTask,				// Task function
@@ -39,20 +69,15 @@ void loop()
 {
 }
 
-void UpdateTask(void *parameter) 
-{
-	Serial.println("UpdateTask start");
-	
+void UpdateTask(void *parameter) {
 	while(true) 
 	{
 		for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
 		{
-			float value = analogRead(G_AnalogInGPIOPins[i]);
-			
-			if(abs(G_AnalogInGPIOData[i] - value) > 10)
-			{
-				G_AnalogInGPIOData[i] = value;
-			}
+			G_AnalogInGPIOData[i] = readAnalog(G_AnalogInGPIOPins[i]);
+			Serial.print("G_AnalogInGPIOPins[");Serial.print(i);Serial.print("] = ");Serial.println(G_AnalogInGPIOPins[i]);
+			Serial.print("G_AnalogInGPIOData[");Serial.print(i);Serial.print("] = ");Serial.println(G_AnalogInGPIOData[i]);	
+			delay(200);
 		}
 		
 		dashBoard.Update();
@@ -95,33 +120,6 @@ void ConnectWifi()
 	Serial.print("Gateway IP: "); Serial.println(WiFi.gatewayIP());
 }
 
-void initGPIO()
-{
-	analogReadResolution(12); 
-
-	for(int i = 0; i < dashBoard.DigitalOutGPIOLength; i++)
-	{
-		pinMode(G_DigitalOutGPIOPins[i], OUTPUT);
-	}
-	for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
-	{
-		analogSetPinAttenuation(G_AnalogInGPIOPins[i], ADC_11db);
-	}
-}
-void initSdCard()
-{
-	if (!sd.begin(CS_PIN, SPI_SPEED)) {
-		Serial.println("Error sd.begin().");
-		if (sd.card()->errorCode()) {
-			Serial.println("SD initialization failed.");
-		} else if (sd.vol()->fatType() == 0) {
-			Serial.println("Can't find a valid FAT16/FAT32 partition.");
-		} else {
-			Serial.println("Can't determine error type");
-		}
-	}
-}
-
 char* readFile(char* name)
 {
 	if(name=="ZuSi3_TS_config.json") return dashConfig;
@@ -147,4 +145,19 @@ char* readFile(char* name)
 	file.close();
 	
 	return data;
+}
+
+int readAnalog(ADS1115_MUX readChannel)
+{
+  int voltage = 0;
+
+  if (adsAvailable)
+  {
+	  adc.setCompareChannels(readChannel);
+	  adc.startSingleMeasurement();
+	  while(adc.isBusy()){}
+	  voltage = adc.getResult_mV();
+  }
+
+  return voltage;
 }
