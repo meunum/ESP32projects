@@ -23,11 +23,11 @@ boolean Zusi3Schnittstelle::connect()
 		NEEDED_DATA();
 		ACK_NEEDED_DATA();
 
-		debug::println("connect erfolgreich");
+		debug::println("Zusi3-TCP-Schnittstelle Verbindungsaufbau erfolgreich");
 
 		return true;
 	}
-//	debug::println("NICHT VERBUNDEN!");
+	Serial.println("Verbindungsaufbau mit Zusi3-TCP-Schnittstelle fehlgeschlagen");
 	return false;
 }
 

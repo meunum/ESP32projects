@@ -29,6 +29,7 @@ private:
 	void loadSystemConfig(JSONVar config);
 	void loadHardwareConfig(JSONVar config);
 	void loadBaureihenConfig(JSONVar config, String baureihe);
+	bool ConnectTcp();
 	String configJson = "";
 	String baureihe = "default";
 	String clientName;

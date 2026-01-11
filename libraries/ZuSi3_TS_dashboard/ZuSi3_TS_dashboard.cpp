@@ -20,20 +20,45 @@ void ZuSi3_TS_DashBoard::SetNetworkClient(NetworkClient *client)
 	debug::print("ZuSi3_TS_DashBoard::SetNetworkClient IP-Adresse: "); debug::print(serverAdresse); debug::print(" Port: "); debug::println(serverPortnummer);
 	
 	networkClient = client;
-	debug::print("Verbinden mit ZuSi ... ");
+	Serial.println("Verbinden mit ZuSi-Server ...");
 	
+	if(ConnectTcp())
+	{		
+		Serial.println(); Serial.println("Server verbunden");
+	}
+	else
+	{
+		Serial.println(); Serial.println("Verbindung nicht hergestellt!");
+	}
+}
+
+bool ZuSi3_TS_DashBoard::ConnectTcp()
+{
+	if (networkClient->connected()) return true;
+	debug::println("ZuSi3_TS_DashBoard::ConnectTcp");
+
+	networkClient->stop();
+
 	IPAddress ip;
 	ip.fromString(serverAdresse);
+
+	debug::print("Connecting to " + serverAdresse + ":"); debug::println(serverPortnummer);
 	
-	networkClient->connect(ip, serverPortnummer);
-	delay(1000);
-	
-	debug::println("");
+	if (!networkClient->connect(ip, serverPortnummer))
+	{
+		debug::print("NOT connected!");
+		return false;
+	}
+
+	debug::print("connected");
+	return true;
 }
 
 void ZuSi3_TS_DashBoard::Update()
 {
-	//debug::println("ZuSi3_TS_DashBoard::Update");
+	debug::println("ZuSi3_TS_DashBoard::Update");
+	
+	if (!networkClient->connected()) ConnectTcp();
 
 	for(int i = 0; i < ControlCount; i++)
 	{
@@ -45,15 +70,13 @@ void ZuSi3_TS_DashBoard::Update()
 			debug::print(Controls[i]->ControlName + " Stufe: "); debug::println(stufe);
 
 			prevStufe = stufe;
-			
-			if(zusiClient != nullptr)
-			{
-				zusiClient->inputSchalterposition(Controls[i]->GetTastaturZuordnung(), stufe);
-			}
+
+			byte input[] = {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 10, 1, 0, 0, 0, 0, 1, 0, 4, 0, 0, 0, 1, 0, 1, 0, 4, 0, 0, 0, 2, 0, 0, 0, 4, 0, 0, 0, 3, 0, 7, 0, 4, 0, 0, 0, 4, 0, 0, 0, 6, 0, 0, 0, 5, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
+			input[48] = stufe & 0xff;
+			input[49] = (stufe >> 8) & 0xff;
+			networkClient->write(input, 72);
 		}
 	}
-	
-	zusiClient->sendTastatureingaben();
 }
 
 void ZuSi3_TS_DashBoard::AddControl(ZuSi3_TS_Control* control)
