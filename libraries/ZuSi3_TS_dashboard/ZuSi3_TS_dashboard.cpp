@@ -221,19 +221,14 @@ void ZuSi3_TS_DashBoard::loadBaureihenConfig(JSONVar config, String baureihe)
 		{
 			if (Controls[j]->ControlName == name)
 			{
-
-				debug::print("tastaturZuordnung JSON "); debug::printlnJV(elementConfig["tastaturZuordnung"]);
-				
 				int tastaturZuordnung = (int) elementConfig["tastaturZuordnung"];
-
-				debug::print("tastaturZuordnung "); debug::println(tastaturZuordnung);
-				
 				Controls[j]->SetTastaturZuordnung(tastaturZuordnung);
 
 				if(Controls[j]->Class == "DynamischerStufenSchalter")
 				{
 					DynamischerStufenSchalter* schalter = static_cast<DynamischerStufenSchalter*>(Controls[j]);
 					JSONVar kombi = elementConfig["kombischalter"];
+					
 					if (kombi == nullptr | JSON.typeof(kombi) == "undefined")
 					{
 						schalter->SetMaxStufe((int) elementConfig["stufen"]);
