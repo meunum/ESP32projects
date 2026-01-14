@@ -56,9 +56,9 @@ bool ZuSi3_TS_DashBoard::ConnectTcp()
 
 void ZuSi3_TS_DashBoard::Update()
 {
-	debug::println("ZuSi3_TS_DashBoard::Update");
+//	debug::println("ZuSi3_TS_DashBoard::Update");
 	
-	if (!networkClient->connected()) ConnectTcp();
+//	if (!networkClient->connected()) ConnectTcp();
 
 	for(int i = 0; i < ControlCount; i++)
 	{
@@ -144,29 +144,36 @@ void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
 	if (controlsConfig == nullptr) { debug::println("Hardware-Steuerelementekonfiguration nicht gefunden"); return; }
 
 	int controlCount = controlsConfig.length();
-	int digitalPinCount = 0;
-	int analogPinCount = 0;
+	int analogInPinCount = 0;
+	int digitalInPinCount = 0;
+	int digitalOutPinCount = 0;
 	
 	for (int i = 0; i < controlsConfig.length(); i++)
 	{
 		String klasse = controlsConfig[i]["klasse"];
 		if(klasse == "DynamischerStufenSchalter")
 		{
-			digitalPinCount += 3;
-			analogPinCount++;
+			digitalOutPinCount += 3;
+			analogInPinCount++;
 		}
 	}
 	
 	Controls = new ZuSi3_TS_Control*[controlCount];
-	G_DigitalOutGPIOPins = new int[digitalPinCount];
-	G_AnalogInGPIOPins = new int[analogPinCount];
-	G_DigitalOutGPIOData = new int[digitalPinCount];
-	G_AnalogInGPIOData = new float[analogPinCount];
-	AnalogInGPIOLength = sizeof(G_AnalogInGPIOPins) / sizeof(int);
-	DigitalOutGPIOLength = sizeof(G_DigitalOutGPIOPins) / sizeof(int);
+
+	AnalogInGPIOLength = analogInPinCount;
+	DigitalInGPIOLength = digitalInPinCount;
+	DigitalOutGPIOLength = digitalOutPinCount;
+
+	G_AnalogInGPIOPins = new int[analogInPinCount];
+	G_DigitalInGPIOPins = new int[digitalInPinCount];
+	G_DigitalOutGPIOPins = new int[digitalOutPinCount];
+
+	G_AnalogInGPIOData = new float[analogInPinCount];
+	G_DigitalInGPIOData = new int[digitalInPinCount];
+	G_DigitalOutGPIOData = new int[digitalOutPinCount];
 	
-	int digitalGpioPinIndex = 0;
-	int analogGpioPinIndex = 0;
+	int digitalOutGpioPinIndex = 0;
+	int analogInGpioPinIndex = 0;
 	
 	for (int i = 0; i < controlsConfig.length(); i++)
 	{
@@ -180,12 +187,12 @@ void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
 		if(klasse == "DynamischerStufenSchalter")
 		{
 			JSONVar gpio = elementConfig["gpio"];
-			G_DigitalOutGPIOPins[digitalGpioPinIndex] = (int) gpio["ena"]; int enaIndex = digitalGpioPinIndex++;
-			G_DigitalOutGPIOPins[digitalGpioPinIndex] = (int) gpio["dir"]; int dirIndex = digitalGpioPinIndex++;
-			G_DigitalOutGPIOPins[digitalGpioPinIndex] = (int) gpio["step"]; int stepIndex = digitalGpioPinIndex++;
-			G_AnalogInGPIOPins[analogGpioPinIndex] = (int) gpio["sensor"]; int sensorIndex = analogGpioPinIndex++;
+			G_DigitalOutGPIOPins[digitalOutGpioPinIndex] = (int) gpio["ena"]; int enaIndex = digitalOutGpioPinIndex++;
+			G_DigitalOutGPIOPins[digitalOutGpioPinIndex] = (int) gpio["dir"]; int dirIndex = digitalOutGpioPinIndex++;
+			G_DigitalOutGPIOPins[digitalOutGpioPinIndex] = (int) gpio["step"]; int stepIndex = digitalOutGpioPinIndex++;
+			G_AnalogInGPIOPins[analogInGpioPinIndex] = (int) gpio["sensor"]; int sensorIndex = analogInGpioPinIndex++;
 
-			Serial.print("G_AnalogInGPIOPins[");Serial.print(analogGpioPinIndex-1);Serial.print("] = ");Serial.println(G_AnalogInGPIOPins[analogGpioPinIndex-1]);
+			Serial.print("G_AnalogInGPIOPins[");Serial.print(analogInGpioPinIndex-1);Serial.print("] = ");Serial.println(G_AnalogInGPIOPins[analogInGpioPinIndex-1]);
 			
 			JSONVar kal = elementConfig["kalibrierung"];
 			int analogMin = (int) kal["min"];

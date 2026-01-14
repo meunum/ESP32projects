@@ -10,9 +10,10 @@ const int CS_PIN = 5;
 SdFat32 sd;
 WiFiClient wifiClient;
 ZuSi3_TS_DashBoard dashBoard;
-TaskHandle_t UpdateTaskHandle = NULL;
 String Wifi_SSID;
 String Wifi_Password;
+TaskHandle_t UpdateTaskHandle = NULL;
+TaskHandle_t AnalogReadTaskHandle = NULL;
 
 char* sysConfig = "{\"system\":{\"wifi\":{\"SSID\":\"FRITZ!Box 7590 BI\",\"password\":\"28149516463916020556\"}}}";
 char* dashConfig = "{\"ZuSi3_TS_config\":{\"system\":{\"clientName\":\"ZuSi3_TS_Dashboard\",\"server\":{\"ipAddresse\":\"192.168.178.65\",\"portNummer\":1436}},\"hardware\":{\"steuerelemente\":[{\"name\":\"stufenschalter_1\",\"klasse\":\"DynamischerStufenSchalter\",\"gpio\":{\"ena\":0,\"dir\":0,\"step\":0,\"sensor\":1},\"kalibrierung\":{\"min\":0,\"max\":4095}}]},\"baureihen\":{\"default\":{\"steuerelemente\":[{\"name\":\"stufenschalter_1\",\"verwendung\":\"Fahrstufe\",\"tastaturZuordnung\":1,\"stufen\":15}]},\"BR118\":{},\"BR154\":{}}}}";
@@ -37,6 +38,16 @@ void setup() {
 		&UpdateTaskHandle,	// Task handle
 		1					// Core
 	);
+	
+	xTaskCreatePinnedToCore(
+		AnalogReadTask,			// Task function
+		"AnalogReadTask",		// Task name
+		10000,				// Stack size (bytes)
+		NULL,				// Parameters
+		1,					// Priority
+		&AnalogReadTaskHandle,	// Task handle
+		1					// Core
+	);
 }
 
 void loop() 
@@ -51,16 +62,39 @@ void UpdateTask(void *parameter)
 	{
 		if (WiFi.status() != WL_CONNECTED) ConnectWifi();
 		
-		for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
+		for(int i = 0; i < dashBoard.DigitalInGPIOLength; i++)
 		{
-			float value = analogRead(G_AnalogInGPIOPins[i]);
-			G_AnalogInGPIOData[i] = value;
+			G_DigitalInGPIOData[i] = digitalRead(G_DigitalInGPIOPins[i]);
 		}
+		
 		dashBoard.Update();
 		
-		for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
+		for(int i = 0; i < dashBoard.DigitalOutGPIOLength; i++)
 		{
 			digitalWrite(G_DigitalOutGPIOPins[i], G_DigitalOutGPIOData[i]);
+		}
+
+		delay(100);
+	}
+}
+
+void AnalogReadTask(void *parameter) 
+{
+	Serial.println("AnalogReadTask start");
+	
+	while(true) 
+	{
+		for(int i = 0; i < dashBoard.AnalogInGPIOLength; i++)
+		{
+			float median = analogRead(G_AnalogInGPIOPins[i]);
+			
+/*			for(int j = 0; j < 1; j++)
+			{
+				float value = analogRead(G_AnalogInGPIOPins[i]);
+				median = (median + value) / 2;
+			}
+*/			
+			G_AnalogInGPIOData[i] = median;
 		}
 	}
 }
@@ -119,7 +153,7 @@ void initGPIO()
 void initSdCard()
 {
 	if (!sd.begin(CS_PIN, SPI_SPEED)) {
-		Serial.println("Error sd.begin().");
+		Serial.println("SD-Card error().");
 		if (sd.card()->errorCode()) {
 			Serial.println("SD initialization failed.");
 		} else if (sd.vol()->fatType() == 0) {

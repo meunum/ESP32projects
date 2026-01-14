@@ -1,8 +1,10 @@
 #include <Arduino.h>
 #include <ZuSi3_TS_controls.h>
 
+int* G_DigitalInGPIOPins;
 int* G_DigitalOutGPIOPins;
 int* G_AnalogInGPIOPins;
+int* G_DigitalInGPIOData;
 int* G_DigitalOutGPIOData;
 float* G_AnalogInGPIOData;
 

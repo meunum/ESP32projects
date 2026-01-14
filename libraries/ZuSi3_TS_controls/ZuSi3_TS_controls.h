@@ -1,10 +1,12 @@
 #pragma once
 #include <Arduino.h>
 
-extern int* G_DigitalOutGPIOPins;
 extern int* G_AnalogInGPIOPins;
-extern int* G_DigitalOutGPIOData;
+extern int* G_DigitalInGPIOPins;
+extern int* G_DigitalOutGPIOPins;
 extern float* G_AnalogInGPIOData;
+extern int* G_DigitalInGPIOData;
+extern int* G_DigitalOutGPIOData;
 
 class StepperMotor
 {
