@@ -15,7 +15,7 @@ String Wifi_Password;
 TaskHandle_t UpdateTaskHandle = NULL;
 TaskHandle_t AnalogReadTaskHandle = NULL;
 
-char* sysConfig = "{\"system\":{\"wifi\":{\"SSID\":\"FRITZ!Box 7590 BI\",\"password\":\"28149516463916020556\"}}}";
+char* sysConfig = "{\"system\":{\"wifi\":{\"SSID\":\"\",\"password\":\"\"}}}";
 char* dashConfig = "{\"ZuSi3_TS_config\":{\"system\":{\"clientName\":\"ZuSi3_TS_Dashboard\",\"server\":{\"ipAddresse\":\"192.168.178.65\",\"portNummer\":1436}},\"hardware\":{\"steuerelemente\":[{\"name\":\"stufenschalter_1\",\"klasse\":\"DynamischerStufenSchalter\",\"gpio\":{\"ena\":0,\"dir\":0,\"step\":0,\"sensor\":1},\"kalibrierung\":{\"min\":0,\"max\":4095}}]},\"baureihen\":{\"default\":{\"steuerelemente\":[{\"name\":\"stufenschalter_1\",\"verwendung\":\"Fahrstufe\",\"tastaturZuordnung\":1,\"stufen\":15}]},\"BR118\":{},\"BR154\":{}}}}";
 
 void setup() {
@@ -88,7 +88,7 @@ void AnalogReadTask(void *parameter)
 		{
 			float median = analogRead(G_AnalogInGPIOPins[i]);
 			
-/*			for(int j = 0; j < 1; j++)
+/*			for(int j = 0; j < #; j++)
 			{
 				float value = analogRead(G_AnalogInGPIOPins[i]);
 				median = (median + value) / 2;
