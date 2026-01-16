@@ -2,7 +2,6 @@
 #include <Arduino_JSON.h>
 #include <WiFi.h>
 #include <SdFat.h>
-#include <NetworkClient_ts.h>
 #include <ZuSi3_TS_dashboard.h>
 
 #define SPI_SPEED SD_SCK_MHZ(4)
@@ -10,7 +9,6 @@ const uint32_t RESPONSE_TIMEOUT = 30000;
 const int CS_PIN = 5;
 SdFat32 sd;
 WiFiClient wifiClient;
-NetworkClient_ts: networkClient(wifiClient);
 ZuSi3_TS_DashBoard dashBoard;
 String Wifi_SSID;
 String Wifi_Password;
@@ -107,8 +105,8 @@ void LoadWifiConfig()
 	JSONVar config = JSON.parse(configJson);
 	if (JSON.typeof(config) == "undefined") { Serial.println("Parsing sysemConfig.json failed!"); return; }
 	
-	Wifi_SSID = (String)config["system"]["wifi"]["SSID"];
-	Wifi_Password = (String)config["system"]["wifi"]["password"];
+	Wifi_SSID = (const char*) config["system"]["wifi"]["SSID"];
+	Wifi_Password = (const char*) config["system"]["wifi"]["password"];
 
 	Serial.println();
 	Serial.print("WiFi SSID: "); Serial.print(Wifi_SSID); Serial.print("; password: "); Serial.println(Wifi_Password);

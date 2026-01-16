@@ -1,11 +1,10 @@
-#include "debug.h"
 #include <ZuSi3_TS_dashboard.h>
 
 ZuSi3_TS_DashBoard::ZuSi3_TS_DashBoard()
 {
 }
 
-void ZuSi3_TS_DashBoard::Init(String config, NetworkClient_ts *nwclient)
+void ZuSi3_TS_DashBoard::Init(String config, Client *nwclient)
 {
 	debug::println("ZuSi3_TS_DashBoard::Init");
 	
@@ -15,7 +14,7 @@ void ZuSi3_TS_DashBoard::Init(String config, NetworkClient_ts *nwclient)
 	zusiClient->connect();
 }
 
-void ZuSi3_TS_DashBoard::SetNetworkClient(NetworkClient_ts *client)
+void ZuSi3_TS_DashBoard::SetNetworkClient(Client *client)
 {
 	debug::print("ZuSi3_TS_DashBoard::SetNetworkClient IP-Adresse: "); debug::print(serverAdresse); debug::print(" Port: "); debug::println(serverPortnummer);
 	
@@ -36,15 +35,12 @@ bool ZuSi3_TS_DashBoard::ConnectTcp()
 {
 	if (networkClient->connected()) return true;
 	debug::println("ZuSi3_TS_DashBoard::ConnectTcp");
+	debug::print("Connecting to " + serverAdresse + ":"); debug::println(serverPortnummer);
 
 	networkClient->stop();
-
 	IPAddress ip;
-	ip.fromString(serverAdresse);
-
-	debug::print("Connecting to " + serverAdresse + ":"); debug::println(serverPortnummer);
 	
-	if (!networkClient->connect(ip, serverPortnummer))
+	if (!networkClient->connect(ip.fromString(serverAdresse), serverPortnummer))
 	{
 		debug::print("NOT connected!");
 		return false;
@@ -125,11 +121,11 @@ void ZuSi3_TS_DashBoard::loadSystemConfig(JSONVar config)
 	
 	JSONVar systemConfig = config["ZuSi3_TS_config"]["system"];
 	if (systemConfig == nullptr) { debug::println("Systemkonfiguration nicht gefunden"); return; }
-	clientName = (String)systemConfig["clientName"];
+	clientName = (const char*)systemConfig["clientName"];
 
 	JSONVar serverConfig = systemConfig["server"];
 	if (serverConfig == nullptr) { debug::println("Netzwerkkonfiguration nicht gefunden"); return; }
-	serverAdresse = (String)serverConfig["ipAddresse"];
+	serverAdresse = (const char*)serverConfig["ipAddresse"];
 	serverPortnummer = serverConfig["portNummer"];
 	
 	delete systemConfig;

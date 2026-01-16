@@ -6,7 +6,10 @@
 #ifndef ZUSI3SCHNITTSTELLE_H
 #define ZUSI3SCHNITTSTELLE_H
 
-#include <NetworkClient.h>
+#include "debug.h"
+
+#include <Arduino.h>
+#include <Client.h>
 #include <LinkedList.h>
 #include "Node.h"
 #include "Fuehrerstandsanzeigen.h"
@@ -14,7 +17,7 @@
 
 class Zusi3Schnittstelle {
 public:
-	Zusi3Schnittstelle(NetworkClient *client, String clientName);
+	Zusi3Schnittstelle(Client *client, String clientName);
 	~Zusi3Schnittstelle();
 	boolean connect();
 	void close();
@@ -45,7 +48,7 @@ private:
 	byte *HEADER = new byte[4]{ 0x00, 0x00, 0x00, 0x00 };
 	byte *ENDE = new byte[4]{ 0xFF, 0xFF, 0xFF, 0xFF };
 
-	NetworkClient *client;
+	Client *client;
 	LinkedList<int> *requestListFuehrerstandsanzeigen = new LinkedList<int>();
 	boolean reqFuehrerstandsbedienung = false;
 	boolean reqProgrammdaten = false;

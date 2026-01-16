@@ -1,6 +1,6 @@
+#include "debug.h"
 #include <Arduino.h>
 #include <Arduino_JSON.h>
-#include <NetworkClient_ts.h>
 #include <ZuSi3Schnittstelle.h>
 #include <ZuSi3_TS_controls.h>
 
@@ -15,8 +15,8 @@ class ZuSi3_TS_DashBoard
 {
 public:
 	ZuSi3_TS_DashBoard();
-	void Init(String config, NetworkClient_ts *nwclient);
-	void SetNetworkClient(NetworkClient *client);
+	void Init(String config, Client *nwclient);
+	void SetNetworkClient(Client *client);
 	void SetConfig(String config_json);
 	void SetBaureihe(String name);
 	void AddControl(ZuSi3_TS_Control* control);
@@ -37,10 +37,10 @@ private:
 	String baureihe = "default";
 	String clientName;
 	String serverAdresse;
-	int serverPortnummer;
+	uint16_t serverPortnummer;
 	int prevStufe = 0;
 	int motorHold = 0;
 	float prevAnalogValue = 0;
-	NetworkClient_ts *networkClient;
+	Client *networkClient;
 	Zusi3Schnittstelle *zusiClient;
 };

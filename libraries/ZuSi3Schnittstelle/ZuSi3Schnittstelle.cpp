@@ -2,10 +2,9 @@
 * Author:	Sebastian Wolf
 * Created:	August 2018
 */
-#include "debug.h"
 #include "Zusi3Schnittstelle.h"
 
-Zusi3Schnittstelle::Zusi3Schnittstelle(NetworkClient *client, String clientName) 
+Zusi3Schnittstelle::Zusi3Schnittstelle(Client *client, String clientName) 
 {
 	debug::print("Zusi3Schnittstelle::Zusi3Schnittstelle clientName: "); debug::println(clientName);
 	this->client = client;
