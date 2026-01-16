@@ -5,7 +5,7 @@ ZuSi3_TS_DashBoard::ZuSi3_TS_DashBoard()
 {
 }
 
-void ZuSi3_TS_DashBoard::Init(String config, NetworkClient *nwclient)
+void ZuSi3_TS_DashBoard::Init(String config, NetworkClient_ts *nwclient)
 {
 	debug::println("ZuSi3_TS_DashBoard::Init");
 	
@@ -15,7 +15,7 @@ void ZuSi3_TS_DashBoard::Init(String config, NetworkClient *nwclient)
 	zusiClient->connect();
 }
 
-void ZuSi3_TS_DashBoard::SetNetworkClient(NetworkClient *client)
+void ZuSi3_TS_DashBoard::SetNetworkClient(NetworkClient_ts *client)
 {
 	debug::print("ZuSi3_TS_DashBoard::SetNetworkClient IP-Adresse: "); debug::print(serverAdresse); debug::print(" Port: "); debug::println(serverPortnummer);
 	

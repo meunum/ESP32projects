@@ -2,6 +2,7 @@
 #include <Arduino_JSON.h>
 #include <WiFi.h>
 #include <SdFat.h>
+#include <NetworkClient_ts.h>
 #include <ZuSi3_TS_dashboard.h>
 
 #define SPI_SPEED SD_SCK_MHZ(4)
@@ -9,6 +10,7 @@ const uint32_t RESPONSE_TIMEOUT = 30000;
 const int CS_PIN = 5;
 SdFat32 sd;
 WiFiClient wifiClient;
+NetworkClient_ts: networkClient(wifiClient);
 ZuSi3_TS_DashBoard dashBoard;
 String Wifi_SSID;
 String Wifi_Password;
