@@ -40,7 +40,13 @@ bool ZuSi3_TS_DashBoard::ConnectTcp()
 	networkClient->stop();
 	IPAddress ip;
 	
-	if (!networkClient->connect(ip.fromString(serverAdresse), serverPortnummer))
+	if(!ip.fromString(serverAdresse))
+	{
+		debug::print("Invalid ip-address");
+		return false;
+	}
+	
+	if (!networkClient->connect(ip, serverPortnummer))
 	{
 		debug::print("NOT connected!");
 		return false;
@@ -156,17 +162,6 @@ void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
 	
 	Controls = new ZuSi3_TS_Control*[controlCount];
 
-	AnalogInGPIOLength = analogInPinCount;
-	DigitalInGPIOLength = digitalInPinCount;
-	DigitalOutGPIOLength = digitalOutPinCount;
-
-	G_AnalogInGPIOPins = new int[analogInPinCount];
-	G_DigitalInGPIOPins = new int[digitalInPinCount];
-	G_DigitalOutGPIOPins = new int[digitalOutPinCount];
-
-	G_AnalogInGPIOData = new float[analogInPinCount];
-	G_DigitalInGPIOData = new int[digitalInPinCount];
-	G_DigitalOutGPIOData = new int[digitalOutPinCount];
 	
 	int digitalOutGpioPinIndex = 0;
 	int analogInGpioPinIndex = 0;
@@ -183,14 +178,11 @@ void ZuSi3_TS_DashBoard::loadHardwareConfig(JSONVar config)
 		if(klasse == "DynamischerStufenSchalter")
 		{
 			JSONVar gpio = elementConfig["gpio"];
-			G_DigitalOutGPIOPins[digitalOutGpioPinIndex] = (int) gpio["ena"]; int enaIndex = digitalOutGpioPinIndex++;
-			G_DigitalOutGPIOPins[digitalOutGpioPinIndex] = (int) gpio["dir"]; int dirIndex = digitalOutGpioPinIndex++;
-			G_DigitalOutGPIOPins[digitalOutGpioPinIndex] = (int) gpio["step"]; int stepIndex = digitalOutGpioPinIndex++;
-			G_AnalogInGPIOPins[analogInGpioPinIndex] = (int) gpio["sensor"]; int sensorIndex = analogInGpioPinIndex++;
-
-			Serial.print("G_AnalogInGPIOPins[");Serial.print(analogInGpioPinIndex-1);Serial.print("] = ");Serial.println(G_AnalogInGPIOPins[analogInGpioPinIndex-1]);
-			
 			JSONVar kal = elementConfig["kalibrierung"];
+			int enaIndex = gpio["ena"];
+			int dirIndex = gpio["dir"];
+			int stepIndex = gpio["step"];
+			int sensorIndex = gpio["sensor"];
 			int analogMin = (int) kal["min"];
 			int analogMax = (int) kal["max"];
 			DynamischerStufenSchalter* schalter = new DynamischerStufenSchalter(name, enaIndex, dirIndex, stepIndex, sensorIndex, analogMin, analogMax); 

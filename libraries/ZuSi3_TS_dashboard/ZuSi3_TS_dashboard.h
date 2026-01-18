@@ -23,9 +23,6 @@ public:
 	void Update();
 	ZuSi3_TS_Control** Controls;
 	int ControlCount = 0;
-	int AnalogInGPIOLength = 0;
-	int DigitalInGPIOLength = 0;
-	int DigitalOutGPIOLength = 0;
 	
 private:
 	JSONVar parseConfig();
